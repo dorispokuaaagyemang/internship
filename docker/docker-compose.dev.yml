@@ -1,0 +1,19 @@
+# Local development override: exposes infrastructure ports so the API and client
+# can run on the host with `npm run dev:server` / `npm run dev:client`.
+# Usage: npm run infra:up
+services:
+  mysql:
+    ports:
+      - "3306:3306"
+  redis:
+    ports:
+      - "6379:6379"
+  seaweedfs:
+    ports:
+      - "8333:8333"
+  # Catches every outgoing email. Set SMTP_HOST=localhost and SMTP_PORT=1025, then read mail at http://localhost:8025.
+  mailpit:
+    image: axllent/mailpit
+    ports:
+      - "1025:1025"
+      - "8025:8025"
