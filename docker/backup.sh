@@ -1,9 +1,12 @@
 #!/usr/bin/env sh
 # Nightly backup on the VPS (docs/DEPLOYMENT.md): the MySQL database and the SeaweedFS files
-# (resumes, certificates). Keeps 7 daily copies and 4 weekly (Sunday) copies.
-# Copy BACKUP_DIR off the server too (rclone/rsync): a backup on the same disk is not enough.
+# (resumes, certificates). Keeps 7 daily copies and 4 weekly (Sunday) copies, so nothing is older
+# than 28 days (privacy/service.js BACKUP_RETENTION_DAYS: erased accounts leave the backups too).
 #
-#   crontab: 30 2 * * * /opt/internship/docker/backup.sh >> /var/log/internship-backup.log 2>&1
+# Off-site: set OFFSITE_REMOTE to an rclone remote (e.g. "r2:internship-backups") configured in
+# RCLONE_CONFIG_DIR. The copy is a *sync*, so old backups are deleted off-site as well.
+#
+#   crontab: 30 2 * * * OFFSITE_REMOTE=r2:internship-backups /opt/internship/docker/backup.sh >> /var/log/internship-backup.log 2>&1
 set -eu
 
 cd "$(dirname "$0")/.."
@@ -34,5 +37,17 @@ fi
 
 find "$BACKUP_DIR/daily" -type f -mtime +7 -delete
 find "$BACKUP_DIR/weekly" -type f -mtime +28 -delete
+
+# Mirror off-site with the same retention: what was deleted above is deleted there too.
+if [ -n "${OFFSITE_REMOTE:-}" ]; then
+  RCLONE_CONFIG_DIR="${RCLONE_CONFIG_DIR:-/root/.config/rclone}"
+  docker run --rm \
+    -v "$BACKUP_DIR":/data:ro \
+    -v "$RCLONE_CONFIG_DIR":/config/rclone:ro \
+    rclone/rclone:1.68 sync /data "$OFFSITE_REMOTE" --delete-after
+  echo "[$(date -Is)] mirrored to $OFFSITE_REMOTE"
+else
+  echo "[$(date -Is)] WARNING: OFFSITE_REMOTE is not set; backups exist only on this server"
+fi
 
 echo "[$(date -Is)] backup $STAMP done: $(du -sh "$BACKUP_DIR/daily" | cut -f1) in daily"

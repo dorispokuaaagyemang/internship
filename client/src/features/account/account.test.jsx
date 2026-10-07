@@ -78,7 +78,9 @@ describe('PrivacyPage', () => {
   it('states the retention periods and contact from the server', async () => {
     api.get.mockResolvedValue({
       data: {
+        controller: 'Example Internships Ltd',
         contactEmail: 'privacy@example.com',
+        backupRetentionDays: 28,
         retention: { inactiveAccountDays: 365, warningDaysBefore: 30, inactiveResumeDays: 182, auditLogDays: 365, unverifiedAccountDays: 30 },
       },
     });
@@ -86,6 +88,9 @@ describe('PrivacyPage', () => {
 
     expect(await screen.findByText(/Accounts not used for 12 months are deleted/)).toBeInTheDocument();
     expect(screen.getByText(/resume is deleted after 6 months/)).toBeInTheDocument();
-    expect(screen.getByRole('link', { name: 'privacy@example.com' })).toHaveAttribute('href', 'mailto:privacy@example.com');
+    expect(screen.getAllByRole('link', { name: 'privacy@example.com' })[0]).toHaveAttribute('href', 'mailto:privacy@example.com');
+    expect(screen.getByText(/Example Internships Ltd is responsible/)).toBeInTheDocument();
+    expect(screen.getByText(/Backups are kept for up to 4 weeks/)).toBeInTheDocument();
+    expect(screen.getByRole('columnheader', { name: 'Legal basis' })).toBeInTheDocument();
   });
 });

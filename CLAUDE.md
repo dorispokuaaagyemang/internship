@@ -21,7 +21,7 @@ Things that differ from local dev and must be done before going live. The full p
 - **Google sign-in:** in Google Cloud Console, replace the localhost entries on the OAuth client. Authorized JavaScript origin: the public URL (e.g. `https://<domain>`); authorized redirect URI: `https://<domain>/api/v1/auth/google/callback` (it must equal `APP_URL` + `/api/v1/auth/google/callback`, or `GOOGLE_CALLBACK_URL` if set). Move the consent screen from Testing to In production so any Google account can sign in, not only test users.
 - **URLs and cookies:** set `APP_URL` and `CORS_ORIGIN` to the public HTTPS URL; leave `COOKIE_SECURE` at its production default (true).
 - **Email:** set `SMTP_*` and `MAIL_FROM`; without `SMTP_HOST` emails are only logged.
-- **Data protection:** set `PRIVACY_CONTACT_EMAIL`; have the privacy notice reviewed; apply the 1-year retention to off-site backups.
+- **Data protection:** set `DATA_CONTROLLER_NAME` and `PRIVACY_CONTACT_EMAIL`; have docs/DATA-PROTECTION.md reviewed; run backups with `OFFSITE_REMOTE` (28-day sync, so erasure reaches backups).
 - **Secrets:** a new `JWT_ACCESS_SECRET`; production R2 keys (or SeaweedFS) and buckets; production database credentials.
 
 ## Commands
@@ -67,6 +67,7 @@ Run from the repo root. Copy `.env.example` to `.env` first. There is one `.env`
 
 - [ACCEPTANCE.md](ACCEPTANCE.md): user stories and acceptance criteria. This is the source of truth for behavior.
 - [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md): the approved system design, covering containers, data model, auth flows, state machines, API surface, jobs, deployment and roadmap.
+- [docs/DATA-PROTECTION.md](docs/DATA-PROTECTION.md): reviewer's pack for the Kenya DPA / GDPR (record of processing, processors, breach procedure, open legal questions). Keep it in step with `modules/privacy`.
 - [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md): production on a VPS (env, HTTPS, Google OAuth, backups, updates).
 - [docs/TRACEABILITY.md](docs/TRACEABILITY.md): maps each acceptance criterion to its endpoints, tables and enforcement. Keep it updated when the design changes.
 

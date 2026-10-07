@@ -131,7 +131,7 @@ client 82) and checks against the real database (Aiven MySQL), storage (Cloudfla
 | Compliance (Kenya DPA 2019 / GDPR) | Met (pending legal review) | Access: `GET /account/export` (JSON of everything held). Erasure: `POST /account/delete` and admin delete both anonymise (`privacy/service.js anonymiseUser`): personal data and files go, shared records stay as "Deleted user". Retention (daily `privacy.retention`): 1 year inactive → anonymised after a 30-day email warning; resumes after ~6 months inactive; unverified accounts after 30 days; audit log after 1 year. Privacy notice at `/privacy` with values from `GET /account/privacy-info`. Minimisation: Google scope `openid email profile`, one strictly necessary cookie |
 
 **Open items**
-- Have the privacy notice reviewed by someone qualified before launch, and apply the 1-year retention to off-site backups too.
+- Legal review of data protection: docs/DATA-PROTECTION.md is the reviewer's pack (record of processing, processors, breach procedure, open questions).
 - The production nginx/HTTPS configuration and `backup.sh` have not been run yet (no Docker on the development machine); do the checklist in DEPLOYMENT.md on a staging server first.
 - Implementation notes ask for use-case diagrams per story; the architecture has context, container, sequence and state diagrams, but no per-story use-case diagrams.
 - No load test: run one before launch if many concurrent users are expected.

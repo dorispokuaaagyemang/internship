@@ -101,5 +101,7 @@ describe('GET /api/v1/account/privacy-info', () => {
 
     expect(res.status).toBe(200);
     expect(res.body.retention).toEqual({ inactiveAccountDays: 365, warningDaysBefore: 30, inactiveResumeDays: 182, auditLogDays: 365, unverifiedAccountDays: 30 });
+    expect(res.body.backupRetentionDays).toBe(28);
+    expect(res.body).toHaveProperty('controller');
   });
 });

@@ -42,6 +42,9 @@ export const RETENTION = {
   unverifiedAccountDays: 30, // password accounts that never confirmed their email
 };
 export const DELETED_NAME = 'Deleted user';
+// docker/backup.sh keeps 7 daily and 4 weekly copies, mirrored off-site: erased data is gone from
+// every backup after at most this long. Keep the two in step.
+export const BACKUP_RETENTION_DAYS = 28;
 
 // --- Erasure ---
 

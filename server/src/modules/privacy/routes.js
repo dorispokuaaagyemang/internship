@@ -12,7 +12,12 @@ const router = Router();
 
 // Public: what the privacy page shows, from the same constants the retention job uses.
 router.get('/privacy-info', (req, res) => {
-  res.json({ contactEmail: config.privacyContactEmail, retention: privacy.RETENTION });
+  res.json({
+    controller: config.dataControllerName,
+    contactEmail: config.privacyContactEmail,
+    retention: privacy.RETENTION,
+    backupRetentionDays: privacy.BACKUP_RETENTION_DAYS,
+  });
 });
 
 router.use(authenticate);
