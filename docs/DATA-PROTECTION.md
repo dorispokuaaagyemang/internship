@@ -28,7 +28,9 @@ locations below are **to be confirmed**; several may be outside Ghana (cross-bor
 
 | Provider | Role | Data | Location to confirm |
 |---|---|---|---|
-| VPS host (production) | Runs the app, MySQL, Redis, file storage | Everything | Chosen at deployment |
+| VPS host (production, if a VPS is used) | Runs the app, MySQL, Redis, file storage | Everything | Chosen at deployment |
+| Render (if used instead of a VPS) | Runs the API and Redis | Everything passing through the API; queued email jobs | Frankfurt (EU) region |
+| Vercel (if used instead of a VPS) | Serves the web app and forwards API requests | Requests in transit, visitor IP addresses in logs | Global network |
 | Aiven (development; production if used) | Managed MySQL | Everything in the database | The Aiven cloud/region selected |
 | Cloudflare R2 (development; production if used) | File storage | Resumes, certificates | R2 "Automatic" location: may be outside Ghana |
 | Email provider (SMTP, to be chosen) | Sends emails | Email address, message content | Provider's region |

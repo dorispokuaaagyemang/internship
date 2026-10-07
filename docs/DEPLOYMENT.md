@@ -4,6 +4,9 @@ How to run the platform in production on a single VPS with Docker Compose (ARCHI
 §11). Everything runs in containers: nginx (HTTPS, the React app, reverse proxy), the API, the
 worker, MySQL, Redis and SeaweedFS (S3-compatible file storage).
 
+Without a server to maintain: the API on Render and the web app on Vercel, described in
+[DEPLOY-RENDER-VERCEL.md](DEPLOY-RENDER-VERCEL.md).
+
 Local development is different (Aiven, Memurai, Cloudflare R2, no Docker); see CLAUDE.md.
 **Never copy your local `.env` to the server.** Production needs its own, described below.
 

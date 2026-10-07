@@ -33,6 +33,18 @@ describe('loadConfig', () => {
     expect(() => loadConfig({ ...validEnv, REDIS_URL: 'http://localhost' })).toThrow(/REDIS_URL/);
   });
 
+  it('reads the hosting options (Render + Vercel)', () => {
+    expect(loadConfig(validEnv)).toMatchObject({ trustProxy: 1, originSecret: null, runWorkerInApi: false });
+    const hosted = loadConfig({ ...validEnv, TRUST_PROXY: '2', ORIGIN_SECRET: 's'.repeat(32), RUN_WORKER_IN_API: 'true' });
+    expect(hosted).toMatchObject({ trustProxy: 2, originSecret: 's'.repeat(32), runWorkerInApi: true });
+    expect(() => loadConfig({ ...validEnv, ORIGIN_SECRET: 'short' })).toThrow(/ORIGIN_SECRET/);
+  });
+
+  it('accepts the database CA certificate as PEM text, with escaped line breaks', () => {
+    const config = loadConfig({ ...validEnv, DB_SSL_CA: '-----BEGIN CERTIFICATE-----\\nabc\\n-----END CERTIFICATE-----' });
+    expect(config.db.ssl.ca).toBe('-----BEGIN CERTIFICATE-----\nabc\n-----END CERTIFICATE-----');
+  });
+
   it('applies auth defaults (ARCHITECTURE.md §4.1)', () => {
     const config = loadConfig(validEnv);
     expect(config.auth).toMatchObject({ accessTtl: '15m', refreshTtlDays: 7, bcryptCost: 12, cookieSecure: false });

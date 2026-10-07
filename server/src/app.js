@@ -9,11 +9,12 @@ import logger from './lib/logger.js';
 import routes from './routes.js';
 import './modules/notifications/listeners.js';
 import { notFound, errorHandler } from './middleware/error.js';
+import { requireOrigin } from './middleware/origin.js';
 
 export function createApp() {
   const app = express();
 
-  app.set('trust proxy', 1); // behind nginx
+  app.set('trust proxy', config.trustProxy); // nginx, or Render's load balancer
   app.use(helmet());
   app.use(cors({ origin: config.corsOrigin, credentials: true }));
   app.use(
@@ -26,6 +27,8 @@ export function createApp() {
       },
     }),
   );
+  // After pino-http, so a refused request is logged and carries its x-request-id.
+  if (config.originSecret) app.use(requireOrigin(config.originSecret));
   app.use(express.json({ limit: '100kb' }));
   app.use(cookieParser());
 

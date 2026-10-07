@@ -20,7 +20,8 @@ const schema = Joi.object({
   DB_NAME: Joi.string().required(),
   DB_USER: Joi.string().required(),
   DB_PASSWORD: Joi.string().allow('').required(),
-  // Path to the server's CA certificate (e.g. Aiven's ca.pem). Set it to connect over verified TLS.
+  // The server's CA certificate (e.g. Aiven's ca.pem), to connect over verified TLS: a file path, or
+  // the PEM text itself ("-----BEGIN CERTIFICATE-----...") where files are awkward (Render).
   DB_SSL_CA: Joi.string().allow('').default(''),
 
   REDIS_URL: Joi.string().uri({ scheme: ['redis', 'rediss'] }).required(),
@@ -42,6 +43,14 @@ const schema = Joi.object({
   AUTH_RATE_LIMIT: Joi.number().integer().min(1).default(20),
   // Requests per IP per 5 minutes across the whole API.
   API_RATE_LIMIT: Joi.number().integer().min(1).default(600),
+  // How many proxies sit in front of the API (nginx: 1). Decides which X-Forwarded-For entry is the client.
+  TRUST_PROXY: Joi.number().integer().min(0).default(1),
+  // Set when a proxy that is not the last hop must vouch for each request (Vercel in front of Render):
+  // requests without this value in X-Origin-Secret are refused, and the client IP is read from
+  // X-Real-IP, which that proxy sets. Leave empty behind nginx. docs/DEPLOY-RENDER-VERCEL.md.
+  ORIGIN_SECRET: Joi.string().allow('').min(32).default(''),
+  // Runs the queue workers inside the API process instead of a separate `npm run worker`.
+  RUN_WORKER_IN_API: Joi.boolean().default(false),
   // Skips the production safety checks (see productionProblems). Never set it on a real server.
   ALLOW_INSECURE_PRODUCTION: Joi.boolean().default(false),
   // Secure cookies need https; the compose stack serves plain http on :80, so set false there.
@@ -109,6 +118,9 @@ export function loadConfig(env = process.env) {
     port: value.PORT,
     logLevel: value.LOG_LEVEL,
     corsOrigin: value.CORS_ORIGIN,
+    trustProxy: value.TRUST_PROXY,
+    originSecret: value.ORIGIN_SECRET || null,
+    runWorkerInApi: value.RUN_WORKER_IN_API,
     apiRateLimit: value.API_RATE_LIMIT,
     db: {
       host: value.DB_HOST,
@@ -163,6 +175,8 @@ export function loadConfig(env = process.env) {
 }
 
 function readCa(path) {
+  // Pasted as one line, the line breaks may arrive as literal "\n".
+  if (path.trim().startsWith('-----BEGIN')) return path.replace(/\\n/g, '\n');
   try {
     return readFileSync(fileURLToPath(new URL(path, rootUrl)), 'utf8');
   } catch (err) {

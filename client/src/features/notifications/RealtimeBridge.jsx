@@ -4,6 +4,8 @@ import { useQueryClient } from '@tanstack/react-query';
 import { getAccessToken, refreshSession } from '../../lib/api';
 import { queriesToRefresh } from './describe';
 
+const SOCKET_URL = import.meta.env.VITE_SOCKET_URL;
+
 // US-07: while signed in, keep a socket to the API. Each `notification` event marks the
 // related queries stale, so open pages refetch and update without a reload. Offline, the
 // data simply refreshes on the next page load.
@@ -11,12 +13,15 @@ export function RealtimeBridge() {
   const queryClient = useQueryClient();
 
   useEffect(() => {
-    const socket = io({
+    const options = {
       path: '/socket.io',
       // A function, so every reconnect sends the current token rather than the first one.
       auth: (cb) => cb({ token: getAccessToken() }),
       transports: ['websocket'],
-    });
+    };
+    // Same origin by default (Vite or nginx proxies it). Vercel can't proxy WebSockets, so there
+    // VITE_SOCKET_URL points at the API host; the token, not a cookie, authenticates the socket.
+    const socket = SOCKET_URL ? io(SOCKET_URL, options) : io(options);
 
     socket.on('notification', (notification) => {
       for (const queryKey of queriesToRefresh(notification)) queryClient.invalidateQueries({ queryKey });
