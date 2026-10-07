@@ -35,6 +35,7 @@ Run from the repo root. Copy `.env.example` to `.env` first. There is one `.env`
 - Single server test: `npm test -w server -- tests/integration/health.test.js`, or `-t "<name>"`.
 - Single client test: `npm test -w client -- src/features/system/SystemStatus.test.jsx`
 - Migrations: `npm run db:migrate -w server` (also `db:migrate:undo`, `db:seed`). The API container runs `db:migrate` on start.
+- Demo data: `npm run db:seed:demo -w server` (`-- --reset` to recreate it, `-- --remove` to delete it). The script is `server/scripts/seed-demo.js`, and it refuses to run in production. It adds Ghanaian companies, students, postings, applications and internships at every stage, and issues one certificate. Every demo account is `<name>@demo.example.com` with password `Demo@2026` (or `DEMO_PASSWORD`), e.g. `admin@`, `kwame.asante@` (rep), `efua.owusu@` (supervisor), `ama.mensah@` (student). Demo companies have `DEMO-` registration numbers. `--remove` deletes only those accounts and companies.
 - Hosted services instead of `infra:up`: MySQL on Aiven (set `DB_SSL_CA` to its `ca.pem`, kept in the gitignored `certs/`), Redis on Upstash (a `rediss://` URL in `REDIS_URL`).
 - `npm run infra:up`: starts only MySQL, Redis, SeaweedFS and Mailpit in Docker, with host ports exposed, for local dev. Mailpit catches email on SMTP :1025 and shows it at http://localhost:8025. `npm run docker:up` / `docker:down` runs the full stack behind nginx on :80. The compose files (`docker-compose.yml`, plus `docker-compose.dev.yml` for host ports) and the nginx image live in `docker/`.
 
