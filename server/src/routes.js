@@ -9,6 +9,7 @@ import applications from './modules/applications/routes.js';
 import notifications from './modules/notifications/routes.js';
 import { apiLimiter } from './middleware/rate-limit.js';
 import internships from './modules/internships/routes.js';
+import account from './modules/privacy/routes.js';
 
 const router = Router();
 
@@ -23,5 +24,6 @@ router.use('/postings', postings);
 router.use('/applications', applications);
 router.use('/notifications', notifications);
 router.use('/internships', internships);
+router.use('/account', account);
 
 export default router;

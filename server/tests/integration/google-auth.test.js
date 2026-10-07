@@ -137,7 +137,7 @@ describe('GET /api/v1/auth/google/callback (US-00A)', () => {
 
     expect(res.headers.location).toBe('http://localhost:5173/auth/complete');
     expect(User.create).not.toHaveBeenCalled();
-    expect(user.update).toHaveBeenCalledWith({ lastLoginAt: expect.any(Date) }, expect.anything());
+    expect(user.update).toHaveBeenCalledWith({ lastLoginAt: expect.any(Date), retentionWarnedAt: null }, expect.anything());
   });
 
   it('links to an existing account with the same email instead of creating a duplicate', async () => {

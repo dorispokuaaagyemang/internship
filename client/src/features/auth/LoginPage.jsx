@@ -56,6 +56,7 @@ export function LoginPage() {
     <main className="page page--narrow">
       <h1>Sign in</h1>
       {params.get('emailVerified') && <Alert tone="success">Your email is verified. You can sign in now.</Alert>}
+      {params.get('accountDeleted') && <Alert tone="success">Your account and personal data have been deleted.</Alert>}
       <Alert>{error}</Alert>
       {unverifiedEmail && (
         <div className="inline-actions">

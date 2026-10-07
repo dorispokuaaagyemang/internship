@@ -97,8 +97,8 @@ This file maps every user story and non-functional requirement in [ACCEPTANCE.md
 
 ## Coverage review (2026-10-07)
 
-Every acceptance criterion checked against the implementation, with automated tests (server 276,
-client 76) and checks against the real database (Aiven MySQL), storage (Cloudflare R2) and Google.
+Every acceptance criterion checked against the implementation, with automated tests (server 282,
+client 82) and checks against the real database (Aiven MySQL), storage (Cloudflare R2) and Google.
 
 | Story | Status | Notes |
 |---|---|---|
@@ -128,10 +128,10 @@ client 76) and checks against the real database (Aiven MySQL), storage (Cloudfla
 | Performance 2–3 s | Met in measurements | Search ~0.4 s, lists well under 1 s against a remote database; no load test has been run |
 | Auditability | Met | Admin actions and auth events in an insert-only audit log, viewable by admins |
 | Reliability (SMS) | Dropped | With US-00B |
-| Compliance (GDPR/local) | **Partly met** | Data minimised (Google scope `openid email profile`), access controlled, audited. **Missing:** self-service account deletion and data export, and a written retention policy. Admin deletion is a soft delete (data kept for the audit trail) |
+| Compliance (Kenya DPA 2019 / GDPR) | Met (pending legal review) | Access: `GET /account/export` (JSON of everything held). Erasure: `POST /account/delete` and admin delete both anonymise (`privacy/service.js anonymiseUser`): personal data and files go, shared records stay as "Deleted user". Retention (daily `privacy.retention`): 1 year inactive → anonymised after a 30-day email warning; resumes after ~6 months inactive; unverified accounts after 30 days; audit log after 1 year. Privacy notice at `/privacy` with values from `GET /account/privacy-info`. Minimisation: Google scope `openid email profile`, one strictly necessary cookie |
 
 **Open items**
-- GDPR/local data-protection: decide on account deletion (anonymise vs. keep), data export, and a retention policy.
+- Have the privacy notice reviewed by someone qualified before launch, and apply the 1-year retention to off-site backups too.
 - The production nginx/HTTPS configuration and `backup.sh` have not been run yet (no Docker on the development machine); do the checklist in DEPLOYMENT.md on a staging server first.
 - Implementation notes ask for use-case diagrams per story; the architecture has context, container, sequence and state diagrams, but no per-story use-case diagrams.
 - No load test: run one before launch if many concurrent users are expected.

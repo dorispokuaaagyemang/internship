@@ -106,7 +106,8 @@ export async function listCompanies({ status, page, limit }) {
   return {
     items: rows.map((company) => ({
       ...serialize(company),
-      reps: (company.members ?? []).map((m) => ({ id: m.user.id, email: m.user.email, phone: m.user.phoneE164 })),
+      // A rep whose account was erased has no user row any more (soft-deleted): left out.
+      reps: (company.members ?? []).filter((m) => m.user).map((m) => ({ id: m.user.id, email: m.user.email, phone: m.user.phoneE164 })),
     })),
     page,
     limit,
@@ -230,7 +231,8 @@ export async function listStaff(repId) {
     raw: true,
   });
   const load = new Map(counts.map((c) => [c.supervisorUserId, Number(c.n)]));
-  return members.map((m) => staffMember(m, m.user, load.get(m.userId) ?? 0));
+  // Erased accounts (soft-deleted users) drop off the staff list.
+  return members.filter((m) => m.user).map((m) => staffMember(m, m.user, load.get(m.userId) ?? 0));
 }
 
 // --- Suspension (US-12) ---

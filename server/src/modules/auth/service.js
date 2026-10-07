@@ -169,7 +169,7 @@ export async function login({ email, password }, { ip }) {
   }
 
   return sequelize.transaction(async (transaction) => {
-    await user.update({ lastLoginAt: new Date() }, { transaction });
+    await user.update({ lastLoginAt: new Date(), retentionWarnedAt: null }, { transaction });
     await record({ actor: user, action: 'auth.login', entity: { type: 'user', id: user.id }, ip }, { transaction });
     return issueTokens(user, { transaction });
   });
@@ -203,6 +203,10 @@ export async function refresh(rawToken, { ip }) {
   if (rotated === 0) return revokeAll();
   if (user.status === 'suspended') throw suspended();
 
+  // Staying signed in counts as activity for the retention rules; recorded at most once a day.
+  if (!user.lastLoginAt || Date.now() - user.lastLoginAt.getTime() > DAY_MS) {
+    await user.update({ lastLoginAt: new Date(), retentionWarnedAt: null });
+  }
   return issueTokens(user);
 }
 
@@ -312,7 +316,7 @@ export async function completeGoogleSignIn({ error, code, state, nonce }, { ip }
   if (user.status === 'suspended') throw suspended();
 
   return sequelize.transaction(async (transaction) => {
-    await user.update({ lastLoginAt: new Date() }, { transaction });
+    await user.update({ lastLoginAt: new Date(), retentionWarnedAt: null }, { transaction });
     await record(
       { actor: user, action: 'auth.google_signin', entity: { type: 'user', id: user.id }, ip, metadata: { outcome } },
       { transaction },

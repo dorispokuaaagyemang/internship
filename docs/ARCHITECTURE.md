@@ -562,6 +562,7 @@ The API also refuses applications after a posting's deadline, so no application 
 | certificates | `POST /internships/:id/complete`, `GET /certificates/:id/download` |
 | notifications | `GET /notifications`, `PATCH /notifications/:id/read` |
 | admin | `GET /admin/stats`, `GET /admin/users?q&role&status`, `POST /admin/users/:id/suspend`, `POST /admin/users/:id/reinstate`, `DELETE /admin/users/:id`, `GET /admin/companies?status=`, `POST /admin/companies/:id/approve`, `POST /admin/companies/:id/suspend`, `POST /admin/companies/:id/reinstate`, `GET /admin/audit-logs` |
+| account | `GET /account/export` (data download), `POST /account/delete` (erasure by anonymisation), `GET /account/privacy-info` (public: retention periods, contact) |
 | system | `GET /health` |
 
 **Conventions:**

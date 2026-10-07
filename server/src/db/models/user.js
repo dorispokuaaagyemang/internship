@@ -7,6 +7,9 @@ export class User extends Model {
   // Never serialize the password hash or Google subject into a response.
   toJSON() {
     const values = { ...this.get() };
+    // Which sign-in methods exist, without the secrets themselves (the account page uses it).
+    values.hasPassword = Boolean(values.passwordHash);
+    values.googleLinked = Boolean(values.googleId);
     delete values.passwordHash;
     delete values.googleId;
     return values;
@@ -26,7 +29,11 @@ export function initUser(sequelize) {
       status: { type: DataTypes.ENUM(...USER_STATUSES), allowNull: false, defaultValue: 'pending' },
       emailVerifiedAt: { type: DataTypes.DATE, allowNull: true },
       phoneE164: { type: DataTypes.STRING(16), allowNull: true },
+      // Last sign-in or session renewal (at most daily): the retention job's measure of activity.
       lastLoginAt: { type: DataTypes.DATE, allowNull: true },
+      // Data protection: when the account was erased (anonymised), and when it was warned about inactivity.
+      anonymisedAt: { type: DataTypes.DATE, allowNull: true },
+      retentionWarnedAt: { type: DataTypes.DATE, allowNull: true },
     },
     { sequelize, modelName: 'User', tableName: 'users', paranoid: true },
   );

@@ -73,6 +73,7 @@ describe('production safety checks', () => {
     APP_URL: 'https://internships.example.com',
     JWT_ACCESS_SECRET: 'kq3V9x0bW7nYt2LmP5cR8sD1fG4hJ6aZ',
     SMTP_HOST: 'smtp.example.com',
+    PRIVACY_CONTACT_EMAIL: 'privacy@example.com',
   };
 
   it('accepts a complete production configuration', () => {

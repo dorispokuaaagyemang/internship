@@ -189,7 +189,7 @@ export async function assignSupervisor(repId, internshipId, { supervisorId }, { 
     where: { companyId, userId: supervisorId, memberRole: 'supervisor' },
     include: [{ model: User, as: 'user', attributes: ['id', 'email', 'status'] }],
   });
-  if (!member) {
+  if (!member?.user) {
     throw new AppError(422, 'VALIDATION_ERROR', 'Choose a supervisor from your staff list', { supervisorId: 'Not a supervisor in your company' });
   }
   if (member.user.status === 'suspended') {

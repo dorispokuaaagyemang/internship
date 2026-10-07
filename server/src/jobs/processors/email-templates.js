@@ -96,6 +96,25 @@ export const templates = {
 <p>To issue their certificate, <a href="${escapeHtml(url)}">add a final evaluation and confirm completion</a>.</p>`,
   }),
 
+  // Data protection: an account inactive for almost a year, anonymised in `days` unless used.
+  retentionWarning: ({ name, days, url }) => ({
+    subject: 'Your Internship Platform account will be deleted soon',
+    text: [
+      `Hello ${name},`,
+      '',
+      `You haven't used your Internship Platform account for almost a year. To protect your data, we delete inactive accounts: yours will be deleted in ${days} days.`,
+      '',
+      'To keep it, just sign in:',
+      url,
+      '',
+      'If you no longer need it, you do not have to do anything.',
+    ].join('\n'),
+    html: `<p>Hello ${escapeHtml(name)},</p>
+<p>You haven't used your Internship Platform account for almost a year. To protect your data, we delete inactive accounts: yours will be deleted in ${escapeHtml(days)} days.</p>
+<p><a href="${escapeHtml(url)}">Sign in to keep your account</a></p>
+<p>If you no longer need it, you do not have to do anything.</p>`,
+  }),
+
   // US-03: confirmation to the student.
   applicationReceived: ({ postingTitle, companyName, url }) => ({
     subject: `Application sent: ${postingTitle}`,

@@ -78,6 +78,9 @@ export function RegisterPage() {
       <GoogleButton intent={role}>Sign up with Google</GoogleButton>
 
       <p className="muted">
+        By creating an account you agree to how we handle your data, described in the <Link to="/privacy">privacy notice</Link>.
+      </p>
+      <p className="muted">
         Already registered? <Link to="/login">Sign in</Link>
       </p>
     </main>

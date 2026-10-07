@@ -138,7 +138,7 @@ describe('POST /api/v1/auth/login', () => {
     expect(res.status).toBe(200);
     expect(res.body.accessToken).toEqual(expect.any(String));
     expect(refreshCookie(res)).toBeDefined();
-    expect(user.update).toHaveBeenCalledWith({ lastLoginAt: expect.any(Date) }, expect.anything());
+    expect(user.update).toHaveBeenCalledWith({ lastLoginAt: expect.any(Date), retentionWarnedAt: null }, expect.anything());
     expect(record).toHaveBeenCalledWith(expect.objectContaining({ action: 'auth.login', actor: user }), expect.anything());
   });
 

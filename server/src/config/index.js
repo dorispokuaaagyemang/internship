@@ -68,6 +68,8 @@ const schema = Joi.object({
   SMTP_USER: Joi.string().allow('').default(''),
   SMTP_PASSWORD: Joi.string().allow('').default(''),
   MAIL_FROM: Joi.string().default('Internship Platform <no-reply@localhost>'),
+  // Data protection: where people send access/erasure requests; shown on the privacy page.
+  PRIVACY_CONTACT_EMAIL: Joi.string().trim().email().allow('').default(''),
 }).unknown(true);
 
 // Fails fast at startup with every missing/invalid variable listed.
@@ -84,6 +86,7 @@ function productionProblems(value) {
   }
   // Without SMTP, verification emails are only logged, so no one could activate an account.
   if (!value.SMTP_HOST) problems.push('SMTP_HOST is required (accounts are activated by email)');
+  if (!value.PRIVACY_CONTACT_EMAIL) problems.push('PRIVACY_CONTACT_EMAIL is required (the privacy notice names it)');
   if (value.COOKIE_SECURE === false) problems.push('COOKIE_SECURE must not be false behind https');
   if (/change-me/i.test(value.DB_PASSWORD ?? '')) problems.push('DB_PASSWORD is a placeholder');
   return problems;
@@ -131,6 +134,7 @@ export function loadConfig(env = process.env) {
       emailVerificationTtlHours: value.EMAIL_VERIFICATION_TTL_HOURS,
     },
     appUrl: value.APP_URL.replace(/\/+$/, ''),
+    privacyContactEmail: value.PRIVACY_CONTACT_EMAIL || null,
     google:
       value.GOOGLE_CLIENT_ID && value.GOOGLE_CLIENT_SECRET
         ? {

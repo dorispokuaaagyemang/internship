@@ -34,6 +34,8 @@ const AdminOverview = named(() => import('../features/admin/OverviewPage'), 'Ove
 const AdminCompanies = named(() => import('../features/admin/CompaniesPage'), 'CompaniesPage');
 const AdminUsers = named(() => import('../features/admin/UsersPage'), 'UsersPage');
 const AdminAudit = named(() => import('../features/admin/AuditPage'), 'AuditPage');
+const AccountPage = named(() => import('../features/account/AccountPage'), 'AccountPage');
+const PrivacyPage = named(() => import('../features/account/PrivacyPage'), 'PrivacyPage');
 
 const internship = (name) => named(() => import('../features/internships/pages'), name);
 const StudentInternships = internship('StudentInternships');
@@ -59,6 +61,7 @@ export function AppRoutes() {
         <Route path="/auth/complete" element={<AuthCompletePage />} />
         {/* US-09: the link a company emails to a new supervisor. */}
         <Route path="/accept-invite/:token" element={<AcceptInvitePage />} />
+        <Route path="/privacy" element={<PrivacyPage />} />
 
         {/* US-03: anyone can browse; applying needs a verified student (checked on the page and by the API). */}
         <Route path="/internships" element={<SearchPage />} />
@@ -66,6 +69,8 @@ export function AppRoutes() {
 
         <Route element={<RequireAuth />}>
           <Route path="/verify" element={<VerifyPage />} />
+          {/* Data protection rights apply to every account, verified or not. */}
+          <Route path="/account" element={<AccountPage />} />
 
           <Route element={<RequireActive />}>
             <Route path="/notifications" element={<NotificationsPage />} />

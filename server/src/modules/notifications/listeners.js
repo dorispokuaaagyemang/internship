@@ -22,7 +22,8 @@ async function companyReps(companyId) {
     where: { companyId, memberRole: 'rep' },
     include: [{ model: User, as: 'user', attributes: ['id', 'email'] }],
   });
-  return reps.map((r) => r.user);
+  // Erased accounts have no user row any more; they get nothing.
+  return reps.map((r) => r.user).filter(Boolean);
 }
 
 const applicationUrl = (id) => `${config.appUrl}/applications/${id}`;

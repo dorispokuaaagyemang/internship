@@ -2,6 +2,7 @@ import logger from '../../lib/logger.js';
 import { closeExpiredPostings } from '../../modules/postings/service.js';
 import { issueMissingCertificates } from '../../modules/internships/service.js';
 import { purgeExpired, remindEndedInternships } from '../../modules/maintenance/service.js';
+import { applyRetention } from '../../modules/privacy/service.js';
 
 const DAY_MS = 24 * 60 * 60 * 1000;
 
@@ -16,6 +17,8 @@ export const SCHEDULES = [
   { id: 'internships-ended', every: DAY_MS, name: 'internships.markEnded' },
   // Security: drop credentials that can no longer be used, and old read notifications.
   { id: 'maintenance-cleanup', every: DAY_MS, name: 'maintenance.cleanup' },
+  // Data protection: warn and anonymise inactive accounts, drop stale resumes and old audit entries.
+  { id: 'privacy-retention', every: DAY_MS, name: 'privacy.retention' },
 ];
 
 const handlers = {
@@ -33,6 +36,11 @@ const handlers = {
     const reminded = await remindEndedInternships();
     if (reminded > 0) logger.info({ reminded }, 'Reminded supervisors of ended internships');
     return { reminded };
+  },
+  'privacy.retention': async () => {
+    const result = await applyRetention();
+    logger.info(result, 'Applied the data retention rules');
+    return result;
   },
   'maintenance.cleanup': async () => {
     const removed = await purgeExpired();

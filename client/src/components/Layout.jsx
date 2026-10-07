@@ -59,7 +59,9 @@ export function Layout() {
             {active && <NotificationBell />}
             {signedIn ? (
               <>
-                <span className="muted topbar__user">{user.email}</span>
+                <NavLink to="/account" className="topbar__user" title="Your account">
+                  {user.email}
+                </NavLink>
                 <button type="button" className="btn btn--link" onClick={logout}>
                   Sign out
                 </button>
@@ -88,6 +90,9 @@ export function Layout() {
           <Outlet />
         </Suspense>
       </div>
+      <footer className="footer">
+        <Link to="/privacy">Privacy</Link>
+      </footer>
     </>
   );
 }

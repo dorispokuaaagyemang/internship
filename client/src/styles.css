@@ -1006,3 +1006,32 @@ code {
   padding: 0.05rem 0.3rem;
   border-radius: 4px;
 }
+
+/* Footer and long-form pages (privacy notice) */
+.footer {
+  max-width: 1040px;
+  margin: 0 auto;
+  padding: 1.5rem 1rem 2rem;
+  border-top: 1px solid var(--border);
+  font-size: 0.9rem;
+}
+
+.prose-page h2 {
+  margin-top: 1.75rem;
+  margin-bottom: 0.5rem;
+}
+
+.prose-page li {
+  margin-bottom: 0.4rem;
+}
+
+a.topbar__user {
+  color: var(--muted);
+  text-decoration: none;
+}
+
+a.topbar__user:hover,
+a.topbar__user.active {
+  color: var(--text);
+  text-decoration: underline;
+}

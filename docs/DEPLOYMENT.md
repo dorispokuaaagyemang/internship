@@ -42,6 +42,7 @@ Generate secrets with: `openssl rand -base64 48`
 | `S3_REGION` | `us-east-1` (SeaweedFS ignores it) |
 | `SMTP_HOST`, `SMTP_PORT`, `SMTP_SECURE`, `SMTP_USER`, `SMTP_PASSWORD` | your mail provider (required: accounts are activated by email) |
 | `MAIL_FROM` | e.g. `Internship Platform <no-reply@internships.example.com>` |
+| `PRIVACY_CONTACT_EMAIL` | where people send data-protection requests; shown on the privacy page (required) |
 | `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET` | see section 5 (leave empty to turn Google sign-in off) |
 
 `DB_HOST`, `REDIS_URL` and `S3_ENDPOINT` are set by Compose to the internal services; values in
@@ -164,3 +165,5 @@ mounted into the containers, and `S3_REGION=auto` for R2). Back up through the p
 - [ ] Google OAuth client updated to the real domain and published (section 5).
 - [ ] Test email: register a test account and receive the verification email.
 - [ ] Backup cron installed, off-site copy configured, one restore tested (section 7).
+- [ ] Privacy notice (`/privacy`) reviewed by someone qualified in data protection law; `PRIVACY_CONTACT_EMAIL` set.
+- [ ] Backups follow the retention rules too: off-site copies older than a year are deleted, so erased accounts don't live on in old dumps.

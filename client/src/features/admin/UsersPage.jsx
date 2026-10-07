@@ -55,7 +55,7 @@ export function UsersPage() {
     if (window.confirm(`Reinstate ${label(u)}?`)) run(() => reinstate.mutateAsync(u.id), `${label(u)} is reinstated.`);
   }
   function onDelete(u) {
-    const reason = askReason(`Delete ${label(u)}'s account? They can no longer sign in. Their records stay for the audit trail.`);
+    const reason = askReason(`Delete ${label(u)}'s account? Their personal data is erased at once; records others rely on stay as "Deleted user".`);
     if (reason) run(() => remove.mutateAsync({ id: u.id, reason }), `${label(u)}'s account is deleted.`);
   }
 

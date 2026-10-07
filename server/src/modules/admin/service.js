@@ -17,6 +17,7 @@ import {
   AuditLog,
 } from '../../db/models/index.js';
 import { record } from '../audit/service.js';
+import { anonymiseUser } from '../privacy/service.js';
 
 // US-12: admin oversight. Every change here is audited with the admin's id and a timestamp.
 
@@ -154,17 +155,13 @@ export async function reinstateUser(admin, userId, { ip }) {
   return serializeUser(user);
 }
 
-// Soft delete (users is paranoid): the row stays for the audit trail and foreign keys, the
-// account can no longer sign in, and its sessions end now.
+// Deleting is erasure: the same anonymisation as a user's own "Delete my account" (data
+// protection). Personal data goes; records others rely on stay as "Deleted user". The reason is
+// audited, but no longer the email address, which would keep personal data in the log.
 export async function deleteUser(admin, userId, { reason }, { ip }) {
   const user = await loadTarget(admin.id, userId);
-  const now = new Date();
-  await sequelize.transaction(async (transaction) => {
-    await RefreshToken.update({ revokedAt: now }, { where: { userId: user.id, revokedAt: null }, transaction });
-    await user.destroy({ transaction });
-    await record({ actor: adminActor(admin), action: 'admin.user_deleted', entity: { type: 'user', id: user.id }, ip, metadata: { reason, email: user.email } }, { transaction });
-  });
-  await cutOff(user.id);
+  await record({ actor: adminActor(admin), action: 'admin.user_deleted', entity: { type: 'user', id: user.id }, ip, metadata: { reason } });
+  await anonymiseUser(user.id, { actor: adminActor(admin), reason, ip, source: 'admin' });
 }
 
 // --- Audit log (US-12) ---

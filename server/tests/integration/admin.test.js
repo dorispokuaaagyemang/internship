@@ -4,6 +4,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { User, RefreshToken, Company, Posting, AuditLog, Notification, CompanyMember } from '../../src/db/models/index.js';
 import redis from '../../src/lib/redis.js';
 import { record } from '../../src/modules/audit/service.js';
+import { anonymiseUser } from '../../src/modules/privacy/service.js';
 import { signAccessToken } from '../../src/lib/tokens.js';
 import { createApp } from '../../src/app.js';
 
@@ -22,6 +23,7 @@ vi.mock('../../src/db/models/index.js', () => ({
 vi.mock('../../src/lib/redis.js', () => ({ default: { get: vi.fn(), set: vi.fn(), del: vi.fn() } }));
 vi.mock('../../src/jobs/queues.js', () => ({ enqueueEmail: vi.fn() }));
 vi.mock('../../src/modules/audit/service.js', () => ({ record: vi.fn() }));
+vi.mock('../../src/modules/privacy/service.js', () => ({ anonymiseUser: vi.fn(async () => true) }));
 
 const app = createApp();
 const admin = `Bearer ${signAccessToken({ id: 1, role: 'admin' })}`;
@@ -141,16 +143,14 @@ describe('admin user management (US-12)', () => {
     expect(unverified.status).toBe('pending');
   });
 
-  it('deletes softly, ending sessions, with the reason audited', async () => {
-    const user = target();
-    User.findByPk.mockResolvedValue(user);
+  it('deletes by anonymising (data protection), auditing the reason but not the email', async () => {
+    User.findByPk.mockResolvedValue(target());
 
     const res = await request(app).delete('/api/v1/admin/users/7').set('Authorization', admin).send({ reason: 'Requested by the user' });
 
     expect(res.status).toBe(204);
-    expect(user.destroy).toHaveBeenCalled();
-    expect(RefreshToken.update).toHaveBeenCalled();
-    expect(record).toHaveBeenCalledWith(expect.objectContaining({ action: 'admin.user_deleted', metadata: { reason: 'Requested by the user', email: 'ada@example.com' } }), expect.anything());
+    expect(anonymiseUser).toHaveBeenCalledWith(7, { actor: { id: 1, role: 'admin' }, reason: 'Requested by the user', ip: expect.any(String), source: 'admin' });
+    expect(record).toHaveBeenCalledWith(expect.objectContaining({ action: 'admin.user_deleted', metadata: { reason: 'Requested by the user' } }));
   });
 });
 
