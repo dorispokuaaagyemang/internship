@@ -30,7 +30,7 @@ import {
 } from '../../db/models/index.js';
 import { record } from '../audit/service.js';
 
-// Data protection (Kenya Data Protection Act 2019, GDPR): the right of access (export), the right to
+// Data protection (Ghana Data Protection Act, 2012 (Act 843); GDPR): the right of access (export), the right to
 // erasure (anonymisation) and storage limitation (the retention rules below).
 
 const DAY_MS = 24 * 60 * 60 * 1000;

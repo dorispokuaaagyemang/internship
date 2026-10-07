@@ -52,11 +52,11 @@ function internship(overrides = {}) {
     application: {
       id: 30,
       studentId: 7,
-      posting: { id: 9, title: 'Data Analyst Intern', location: 'Nairobi', companyId: 5, company: { id: 5, name: 'Acme Ltd' } },
-      profile: { userId: 7, fullName: 'Ada Lovelace', university: 'UoN', department: 'CS', gpa: 3.6, resumeFileId: null, skills: [] },
+      posting: { id: 9, title: 'Data Analyst Intern', location: 'Accra', companyId: 5, company: { id: 5, name: 'Acme Ltd' } },
+      profile: { userId: 7, fullName: 'Ada Lovelace', university: 'UG', department: 'CS', gpa: 3.6, resumeFileId: null, skills: [] },
       student: { id: 7, email: 'ada@example.com' },
     },
-    activeAssignment: { supervisorUserId: 50, assignedAt: new Date(), supervisor: { id: 50, email: 'sv@acme.co.ke', membership: { fullName: 'Grace Hopper' } } },
+    activeAssignment: { supervisorUserId: 50, assignedAt: new Date(), supervisor: { id: 50, email: 'sv@acme.com.gh', membership: { fullName: 'Grace Hopper' } } },
     ...overrides,
   };
 }

@@ -53,7 +53,7 @@ function RegisterCompany() {
         <Field label="Registration number" error={formState.errors.regNumber?.message} hint="As issued by the business registry, e.g. PVT-2024/123">
           {(a11y) => <input {...a11y} {...register('regNumber')} />}
         </Field>
-        <Field label="Contact phone" error={formState.errors.contactPhone?.message} hint="With the country code, e.g. +254712345678.">
+        <Field label="Contact phone" error={formState.errors.contactPhone?.message} hint="With the country code, e.g. +233241234567.">
           {(a11y) => <input type="tel" autoComplete="tel" {...a11y} {...register('contactPhone')} />}
         </Field>
         <Field label="Website (optional)" error={formState.errors.website?.message}>

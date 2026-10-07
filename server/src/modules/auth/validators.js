@@ -21,7 +21,7 @@ export const phone = Joi.string()
     if (!parsed || !parsed.isValid()) return helpers.error('phone.invalid');
     return parsed.number;
   })
-  .messages({ 'phone.invalid': 'Enter a valid phone number with its country code, e.g. +254712345678' });
+  .messages({ 'phone.invalid': 'Enter a valid phone number with its country code, e.g. +233241234567' });
 
 const email = Joi.string().trim().lowercase().email().max(255).required();
 

@@ -13,7 +13,7 @@ export function LocationProbe() {
 export function makeAuth(overrides = {}) {
   return {
     status: 'signedIn',
-    user: { id: 7, email: 'ada@example.com', role: 'student', status: 'active', phoneE164: '+254712345678', emailVerifiedAt: '2026-10-06T00:00:00Z' },
+    user: { id: 7, email: 'ada@example.com', role: 'student', status: 'active', phoneE164: '+233241234567', emailVerifiedAt: '2026-10-06T00:00:00Z' },
     login: vi.fn(),
     register: vi.fn(),
     logout: vi.fn(),

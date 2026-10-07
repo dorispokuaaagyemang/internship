@@ -21,11 +21,11 @@ const posting = (overrides = {}) => ({
   id: 9,
   title: 'Data Analyst Intern',
   description: 'Work with our data team.',
-  location: 'Nairobi',
+  location: 'Accra',
   domain: 'Data',
   durationWeeks: 12,
   stipend: 15000,
-  stipendCurrency: 'KES',
+  stipendCurrency: 'GHS',
   deadline: new Date(Date.now() + 10 * DAY).toISOString(),
   status: 'active',
   company: { id: 5, name: 'Acme Ltd', website: null },
@@ -86,7 +86,7 @@ describe('ProfilePage (US-02)', () => {
     renderApp(<ProfilePage />);
 
     await userEvent.type(await screen.findByLabelText('Full name'), 'Ada Lovelace');
-    await userEvent.type(screen.getByLabelText('University'), 'University of Nairobi');
+    await userEvent.type(screen.getByLabelText('University'), 'University of Ghana');
     await userEvent.type(screen.getByLabelText('Department'), 'CS');
     await userEvent.type(screen.getByLabelText('GPA (optional)'), '3.6');
     await userEvent.type(screen.getByLabelText('Skills'), 'SQL{Enter}');
@@ -95,7 +95,7 @@ describe('ProfilePage (US-02)', () => {
     await waitFor(() =>
       expect(api.put).toHaveBeenCalledWith('/students/me', {
         fullName: 'Ada Lovelace',
-        university: 'University of Nairobi',
+        university: 'University of Ghana',
         department: 'CS',
         gpa: 3.6,
         bio: '',
@@ -141,10 +141,10 @@ describe('ProfilePage (US-02)', () => {
 describe('SearchPage (US-03)', () => {
   it('searches from the URL and lists open postings', async () => {
     api.get.mockResolvedValue({ data: { items: [posting()], total: 1, page: 1, limit: 10 } });
-    renderApp(<SearchPage />, { route: '/internships?q=data&location=Nairobi', path: '/internships' });
+    renderApp(<SearchPage />, { route: '/internships?q=data&location=Accra', path: '/internships' });
 
     expect(await screen.findByRole('link', { name: 'Data Analyst Intern' })).toHaveAttribute('href', '/internships/9');
-    expect(api.get).toHaveBeenCalledWith('/postings', { params: { q: 'data', location: 'Nairobi', domain: undefined, page: 1, limit: 10 } });
+    expect(api.get).toHaveBeenCalledWith('/postings', { params: { q: 'data', location: 'Accra', domain: undefined, page: 1, limit: 10 } });
     expect(screen.getByText('1 internship open')).toBeInTheDocument();
     expect(screen.getByText(/Closes in \d+ days/)).toBeInTheDocument();
   });

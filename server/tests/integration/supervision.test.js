@@ -59,8 +59,8 @@ function internship(overrides = {}) {
     application: {
       id: 30,
       studentId: 7,
-      posting: { id: 9, title: 'Data Analyst Intern', location: 'Nairobi', companyId: 5, company: { id: 5, name: 'Acme Ltd' } },
-      profile: { userId: 7, fullName: 'Ada Lovelace', university: 'UoN', department: 'CS', gpa: 3.6, resumeFileId: null, skills: [{ name: 'SQL' }] },
+      posting: { id: 9, title: 'Data Analyst Intern', location: 'Accra', companyId: 5, company: { id: 5, name: 'Acme Ltd' } },
+      profile: { userId: 7, fullName: 'Ada Lovelace', university: 'UG', department: 'CS', gpa: 3.6, resumeFileId: null, skills: [{ name: 'SQL' }] },
       student: { id: 7, email: 'ada@example.com' },
     },
     activeAssignment: null,
@@ -73,7 +73,7 @@ function internship(overrides = {}) {
 const withSupervisor = (id = 50) => ({
   supervisorUserId: id,
   assignedAt: new Date(),
-  supervisor: { id, email: 'sv@acme.co.ke', membership: { fullName: 'Grace Hopper' } },
+  supervisor: { id, email: 'sv@acme.com.gh', membership: { fullName: 'Grace Hopper' } },
 });
 
 beforeEach(() => {
@@ -130,15 +130,15 @@ describe('staff invites (US-09)', () => {
     User.create.mockImplementation(async (values) => ({ id: 50, ...values }));
     CompanyMember.create.mockImplementation(async (values) => values);
 
-    const res = await request(app).post('/api/v1/companies/me/staff').set('Authorization', rep).send({ fullName: 'Grace Hopper', email: 'Grace@Acme.co.ke' });
+    const res = await request(app).post('/api/v1/companies/me/staff').set('Authorization', rep).send({ fullName: 'Grace Hopper', email: 'Grace@Acme.com.gh' });
 
     expect(res.status).toBe(201);
-    expect(res.body.member).toMatchObject({ id: 50, email: 'grace@acme.co.ke', fullName: 'Grace Hopper', status: 'invited', activeInterns: 0 });
-    expect(User.create).toHaveBeenCalledWith({ email: 'grace@acme.co.ke', displayName: 'Grace Hopper', role: 'supervisor', status: 'pending' }, expect.anything());
+    expect(res.body.member).toMatchObject({ id: 50, email: 'grace@acme.com.gh', fullName: 'Grace Hopper', status: 'invited', activeInterns: 0 });
+    expect(User.create).toHaveBeenCalledWith({ email: 'grace@acme.com.gh', displayName: 'Grace Hopper', role: 'supervisor', status: 'pending' }, expect.anything());
     expect(CompanyMember.create).toHaveBeenCalledWith({ companyId: 5, userId: 50, memberRole: 'supervisor', fullName: 'Grace Hopper' }, expect.anything());
 
     const [template, to, data] = enqueueEmail.mock.calls[0];
-    expect([template, to]).toEqual(['staffInvite', 'grace@acme.co.ke']);
+    expect([template, to]).toEqual(['staffInvite', 'grace@acme.com.gh']);
     const token = data.url.split('/').pop();
     expect(data.url).toBe(`http://localhost:5173/accept-invite/${token}`);
     expect(AccountInvite.create.mock.calls[0][0]).toMatchObject({ userId: 50, invitedBy: 20, tokenHash: hashToken(token) });
@@ -157,9 +157,9 @@ describe('staff invites (US-09)', () => {
 
   it('lists staff with each supervisor\'s current number of interns', async () => {
     CompanyMember.findAll.mockResolvedValue([
-      { userId: 20, memberRole: 'rep', fullName: null, user: { id: 20, email: 'rep@acme.co.ke', status: 'active', passwordHash: 'h' } },
-      { userId: 50, memberRole: 'supervisor', fullName: 'Grace Hopper', user: { id: 50, email: 'sv@acme.co.ke', status: 'active', passwordHash: 'h' } },
-      { userId: 51, memberRole: 'supervisor', fullName: 'New Person', user: { id: 51, email: 'new@acme.co.ke', status: 'pending', passwordHash: null } },
+      { userId: 20, memberRole: 'rep', fullName: null, user: { id: 20, email: 'rep@acme.com.gh', status: 'active', passwordHash: 'h' } },
+      { userId: 50, memberRole: 'supervisor', fullName: 'Grace Hopper', user: { id: 50, email: 'sv@acme.com.gh', status: 'active', passwordHash: 'h' } },
+      { userId: 51, memberRole: 'supervisor', fullName: 'New Person', user: { id: 51, email: 'new@acme.com.gh', status: 'pending', passwordHash: null } },
     ]);
     SupervisorAssignment.findAll.mockResolvedValue([{ supervisorUserId: 50, n: '3' }]);
 
@@ -176,7 +176,7 @@ describe('staff invites (US-09)', () => {
 describe('accepting an invite (US-09)', () => {
   const pendingSupervisor = () => ({
     id: 50,
-    email: 'grace@acme.co.ke',
+    email: 'grace@acme.com.gh',
     role: 'supervisor',
     status: 'pending',
     passwordHash: null,
@@ -198,7 +198,7 @@ describe('accepting an invite (US-09)', () => {
 
     const res = await request(app).get('/api/v1/auth/invite/tok123');
 
-    expect(res.body.invite).toEqual({ email: 'grace@acme.co.ke', fullName: 'Grace Hopper', companyName: 'Acme Ltd' });
+    expect(res.body.invite).toEqual({ email: 'grace@acme.com.gh', fullName: 'Grace Hopper', companyName: 'Acme Ltd' });
     expect(AccountInvite.findOne).toHaveBeenCalledWith({ where: { tokenHash: hashToken('tok123') } });
   });
 
@@ -278,7 +278,7 @@ describe('POST /api/v1/internships/:id/supervisor (US-09)', () => {
     CompanyMember.findOne.mockImplementation(async ({ where }) =>
       where.memberRole === 'supervisor'
         ? where.userId === 50
-          ? { fullName: 'Grace Hopper', user: { id: 50, email: 'sv@acme.co.ke', status: 'active' } }
+          ? { fullName: 'Grace Hopper', user: { id: 50, email: 'sv@acme.com.gh', status: 'active' } }
           : null
         : repMembership,
     );
@@ -306,7 +306,7 @@ describe('POST /api/v1/internships/:id/supervisor (US-09)', () => {
     const types = Notification.bulkCreate.mock.calls.map(([rows]) => `${rows[0].type}:${rows[0].userId}`);
     expect(types.sort()).toEqual(['intern.assigned:50', 'supervisor.assigned:7']);
     const recipients = enqueueEmail.mock.calls.filter(([t]) => t === 'supervisorAssigned').map(([, to, d]) => `${d.recipient}:${to}`);
-    expect(recipients.sort()).toEqual(['student:ada@example.com', 'supervisor:sv@acme.co.ke']);
+    expect(recipients.sort()).toEqual(['student:ada@example.com', 'supervisor:sv@acme.com.gh']);
   });
 
   it('only accepts a supervisor from this company\'s staff', async () => {

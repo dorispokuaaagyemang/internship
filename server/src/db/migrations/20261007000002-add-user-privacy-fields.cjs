@@ -1,6 +1,6 @@
 'use strict';
 
-// Data protection (Kenya Data Protection Act 2019 / GDPR): an erased account is anonymised, not
+// Data protection (Ghana Data Protection Act, 2012 (Act 843) / GDPR): an erased account is anonymised, not
 // removed, so other people's records (applications, evaluations, audit log) stay consistent.
 // retention_warned_at: when the "inactive for almost a year" email went out (privacy/service.js).
 module.exports = {

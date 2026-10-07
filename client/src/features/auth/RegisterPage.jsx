@@ -64,9 +64,9 @@ export function RegisterPage() {
         <Field
           label={role === 'company_rep' ? 'Company contact phone' : 'Phone number'}
           error={formState.errors.phone?.message}
-          hint="With the country code, e.g. +254712345678."
+          hint="With the country code, e.g. +233241234567."
         >
-          {(a11y) => <input type="tel" autoComplete="tel" placeholder="+254712345678" {...a11y} {...register('phone')} />}
+          {(a11y) => <input type="tel" autoComplete="tel" placeholder="+233241234567" {...a11y} {...register('phone')} />}
         </Field>
 
         <Button type="submit" busy={formState.isSubmitting}>

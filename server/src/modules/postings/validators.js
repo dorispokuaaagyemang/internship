@@ -32,9 +32,9 @@ export const postingSchema = Joi.object({
     'number.base': 'Stipend must be a number',
     'number.min': 'Stipend cannot be negative',
   }),
-  stipendCurrency: Joi.string().trim().uppercase().length(3).pattern(/^[A-Z]{3}$/).default('KES').messages({
-    'string.length': 'Use a 3-letter currency code, e.g. KES',
-    'string.pattern.base': 'Use a 3-letter currency code, e.g. KES',
+  stipendCurrency: Joi.string().trim().uppercase().length(3).pattern(/^[A-Z]{3}$/).default('GHS').messages({
+    'string.length': 'Use a 3-letter currency code, e.g. GHS',
+    'string.pattern.base': 'Use a 3-letter currency code, e.g. GHS',
   }),
   deadline: Joi.date()
     .iso()

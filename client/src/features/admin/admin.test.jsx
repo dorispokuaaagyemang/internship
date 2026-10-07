@@ -19,12 +19,12 @@ const pending = {
   id: 5,
   name: 'Acme Ltd',
   regNumber: 'PVT-1',
-  contactPhone: '+254712345678',
-  website: 'https://acme.co.ke',
+  contactPhone: '+233241234567',
+  website: 'https://acme.com.gh',
   status: 'pending_verification',
   createdAt: '2026-10-01T08:00:00Z',
   verifiedAt: null,
-  reps: [{ id: 7, email: 'rep@acme.co.ke', phone: '+254712345678' }],
+  reps: [{ id: 7, email: 'rep@acme.com.gh', phone: '+233241234567' }],
 };
 
 function answerCompanies(companies) {
@@ -44,7 +44,7 @@ describe('CompaniesPage (US-04, US-12)', () => {
     renderApp(<CompaniesPage />, { auth: admin });
 
     expect(await screen.findByText('Acme Ltd')).toBeInTheDocument();
-    expect(screen.getByRole('link', { name: 'rep@acme.co.ke' })).toHaveAttribute('href', 'mailto:rep@acme.co.ke');
+    expect(screen.getByRole('link', { name: 'rep@acme.com.gh' })).toHaveAttribute('href', 'mailto:rep@acme.com.gh');
     expect(api.get).toHaveBeenCalledWith('/admin/companies', { params: { status: 'pending_verification', page: 1, limit: 20 } });
     expect(screen.getByRole('tab', { name: 'Awaiting verification' })).toHaveAttribute('aria-selected', 'true');
   });

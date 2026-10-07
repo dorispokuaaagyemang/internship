@@ -36,11 +36,11 @@ const posting = (overrides = {}) => ({
   companyId: 5,
   title: 'Data Analyst Intern',
   description: 'Work with our data team.',
-  location: 'Nairobi',
+  location: 'Accra',
   domain: 'Data',
   durationWeeks: 12,
   stipend: 15000,
-  stipendCurrency: 'KES',
+  stipendCurrency: 'GHS',
   deadline: new Date(Date.now() + 10 * DAY),
   status: 'draft',
   publishedAt: null,
@@ -55,7 +55,7 @@ const posting = (overrides = {}) => ({
 const body = {
   title: 'Data Analyst Intern',
   description: 'Work with our data team.',
-  location: 'Nairobi',
+  location: 'Accra',
   domain: 'Data',
   durationWeeks: 12,
   stipend: 15000,
@@ -83,7 +83,7 @@ describe('POST /api/v1/postings (US-05)', () => {
 
     expect(res.status).toBe(201);
     expect(Posting.create).toHaveBeenCalledWith(
-      expect.objectContaining({ title: 'Data Analyst Intern', companyId: 5, createdBy: 7, status: 'draft', stipendCurrency: 'KES' }),
+      expect.objectContaining({ title: 'Data Analyst Intern', companyId: 5, createdBy: 7, status: 'draft', stipendCurrency: 'GHS' }),
       expect.anything(),
     );
     expect(created.setSkills).toHaveBeenCalledWith([{ id: 1, name: 'SQL' }, { id: 2, name: 'Excel' }], expect.anything());
@@ -277,7 +277,7 @@ describe('toBooleanQuery', () => {
   it('requires every word as a prefix and drops FULLTEXT operators', () => {
     expect(toBooleanQuery('data  analyst')).toBe('+data* +analyst*');
     expect(toBooleanQuery('"C++" -java (dev)')).toBe('+C* +java* +dev*');
-    expect(toBooleanQuery('Développeur Nairobi')).toBe('+Développeur* +Nairobi*');
+    expect(toBooleanQuery('Développeur Accra')).toBe('+Développeur* +Accra*');
   });
 });
 

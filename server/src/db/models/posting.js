@@ -24,7 +24,7 @@ export function initPosting(sequelize) {
           return value === null || value === undefined ? value : Number(value);
         },
       },
-      stipendCurrency: { type: DataTypes.CHAR(3), allowNull: false, defaultValue: 'KES' },
+      stipendCurrency: { type: DataTypes.CHAR(3), allowNull: false, defaultValue: 'GHS' },
       deadline: { type: DataTypes.DATE, allowNull: false },
       status: { type: DataTypes.ENUM(...POSTING_STATUSES), allowNull: false, defaultValue: 'draft' },
       publishedAt: { type: DataTypes.DATE, allowNull: true },

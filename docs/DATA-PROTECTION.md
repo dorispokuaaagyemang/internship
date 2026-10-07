@@ -1,7 +1,7 @@
 # Data protection: reviewer's pack
 
-Prepared by the development team for whoever reviews the platform against the **Kenya Data
-Protection Act, 2019** (and the GDPR, if users in the EU are expected). It describes what the system
+Prepared by the development team for whoever reviews the platform against **Ghana's Data
+Protection Act, 2012 (Act 843)** (and the GDPR, if users in the EU are expected). It describes what the system
 does today, so the review can focus on the legal questions at the end. **This is not legal advice.**
 
 The user-facing notice is the page `/privacy` (`client/src/features/account/PrivacyPage.jsx`).
@@ -24,13 +24,13 @@ Its controller name, contact address and retention periods come from the server 
 ## 2. Service providers (processors) and locations
 
 Confirm each provider's data location and that a data processing agreement is in place. The
-locations below are **to be confirmed**; several may be outside Kenya (cross-border transfer).
+locations below are **to be confirmed**; several may be outside Ghana (cross-border transfer).
 
 | Provider | Role | Data | Location to confirm |
 |---|---|---|---|
 | VPS host (production) | Runs the app, MySQL, Redis, file storage | Everything | Chosen at deployment |
 | Aiven (development; production if used) | Managed MySQL | Everything in the database | The Aiven cloud/region selected |
-| Cloudflare R2 (development; production if used) | File storage | Resumes, certificates | R2 "Automatic" location: may be outside Kenya |
+| Cloudflare R2 (development; production if used) | File storage | Resumes, certificates | R2 "Automatic" location: may be outside Ghana |
 | Email provider (SMTP, to be chosen) | Sends emails | Email address, message content | Provider's region |
 | Google (only if a user chooses Google sign-in) | Sign-in | Name, email (scopes `openid email profile`) | Google |
 
@@ -62,7 +62,7 @@ development services.
 | Erasure | Self-service: `/account` → "Delete my account" (`POST /account/delete`); admins can also delete. Both **anonymise** (`anonymiseUser()`): personal data and files are erased; shared records remain as "Deleted user" |
 | Object / restrict | By request to `PRIVACY_CONTACT_EMAIL`; an admin can suspend an account to stop processing while a request is handled |
 | Portability | The JSON export is machine-readable |
-| Complain | Notice points to the Office of the Data Protection Commissioner |
+| Complain | Notice points to the Data Protection Commission of Ghana |
 
 Keep a simple log of requests received by email (date, request, action, date answered).
 
@@ -73,23 +73,23 @@ Keep a simple log of requests received by email (date, request, action, date ans
    if data was altered.
 2. **Assess:** what data, whose, how many people, the risk to them. Sources: the audit log (admin
    portal → Audit log), API logs (`docker compose logs api`), provider dashboards.
-3. **Notify the Data Commissioner** when the breach is likely to put people at risk, **within the
-   deadline the Act sets (understood to be 72 hours of becoming aware; confirm)**, with what is
-   known so far.
-4. **Tell affected people** without undue delay when the risk to them is high, with what they
+3. **Notify the Data Protection Commission** when personal data has been accessed or acquired by
+   someone unauthorised, **as soon as reasonably practicable after discovering it (Act 843; confirm
+   the exact requirement)**, with what is known so far.
+4. **Tell affected people** as soon as reasonably practicable as well, with what they
    should do (e.g. change passwords).
 5. **Record** every breach, even minor ones: facts, effects, action taken.
 
 ## 6. Questions for the reviewer
 
-1. **Registration:** must the operator register with the Office of the Data Protection
-   Commissioner as a data controller (and/or processor), given the number of users and the nature
-   of the data?
+1. **Registration:** Act 843 requires data controllers to register with the Data Protection
+   Commission before processing personal data. Confirm the registration (and renewal) steps for the
+   operator, and whether service providers must register too.
 2. **Who is the controller for application data?** Is a company that receives applications an
    independent controller for them (needing its own notice to applicants), or a processor for us?
 3. **Legal bases:** are the bases in section 1 right? Is consent needed anywhere (e.g. sharing
    GPA with companies, Google sign-in)?
-4. **Cross-border transfers:** which safeguards are needed for providers outside Kenya, and what
+4. **Cross-border transfers:** which safeguards are needed for providers outside Ghana, and what
    must the notice say about them?
 5. **Minors:** can students under 18 use the platform? If so, guardian consent and a different
    notice are needed.
@@ -107,7 +107,7 @@ Keep a simple log of requests received by email (date, request, action, date ans
 - [ ] Review completed; notice and this pack updated with the answers.
 - [ ] `DATA_CONTROLLER_NAME` and `PRIVACY_CONTACT_EMAIL` set in the production `.env`.
 - [ ] Provider locations confirmed; data processing agreements in place (section 2).
-- [ ] Registration with the ODPC done if required.
+- [ ] Registered with the Data Protection Commission of Ghana.
 - [ ] Backups mirrored off-site with `OFFSITE_REMOTE` (docs/DEPLOYMENT.md §7); the 28-day sync is
       what makes erasure reach the backups.
 - [ ] A named person monitors `PRIVACY_CONTACT_EMAIL` and knows the breach procedure (section 5).

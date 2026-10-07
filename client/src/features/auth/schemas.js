@@ -17,7 +17,7 @@ export const phone = z
   .string()
   .trim()
   .min(1, 'Phone number is required')
-  .regex(/^\+[\d\s-]{8,20}$/, 'Include the country code, e.g. +254712345678');
+  .regex(/^\+[\d\s-]{8,20}$/, 'Include the country code, e.g. +233241234567');
 
 export const loginSchema = z.object({
   email,

@@ -74,13 +74,13 @@ describe('RegisterPage (US-01, US-04)', () => {
 
     await userEvent.click(screen.getByLabelText(/Registering a company/));
     await userEvent.type(screen.getByLabelText('Full name'), 'Grace Hopper');
-    await userEvent.type(screen.getByLabelText('Email'), 'rep@acme.co.ke');
+    await userEvent.type(screen.getByLabelText('Email'), 'rep@acme.com.gh');
     await userEvent.type(screen.getByLabelText('Password'), 'secret#123');
-    await userEvent.type(screen.getByLabelText('Company contact phone'), '+254 712 345 678');
+    await userEvent.type(screen.getByLabelText('Company contact phone'), '+233 24 123 4567');
     await userEvent.click(screen.getByRole('button', { name: 'Create account' }));
 
     await waitFor(() =>
-      expect(auth.register).toHaveBeenCalledWith({ fullName: 'Grace Hopper', role: 'company_rep', email: 'rep@acme.co.ke', password: 'secret#123', phone: '+254712345678' }),
+      expect(auth.register).toHaveBeenCalledWith({ fullName: 'Grace Hopper', role: 'company_rep', email: 'rep@acme.com.gh', password: 'secret#123', phone: '+233241234567' }),
     );
     expect(await screen.findAllByText('An account with this email already exists')).not.toHaveLength(0);
   });
@@ -88,7 +88,7 @@ describe('RegisterPage (US-01, US-04)', () => {
 
 describe('VerifyPage (US-01)', () => {
   const pending = () =>
-    makeAuth({ user: { id: 7, email: 'ada@example.com', role: 'student', status: 'pending', phoneE164: '+254712345678', emailVerifiedAt: null } });
+    makeAuth({ user: { id: 7, email: 'ada@example.com', role: 'student', status: 'pending', phoneE164: '+233241234567', emailVerifiedAt: null } });
 
   it('asks only for the email link (no SMS step) and can resend it', async () => {
     api.post.mockResolvedValue({ data: {} });

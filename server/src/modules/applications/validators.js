@@ -36,7 +36,7 @@ export const myApplicationsQuery = Joi.object({
   ...paging,
 });
 
-// US-06: ?skills=SQL,Excel&university=Nairobi&minGpa=3
+// US-06: ?skills=SQL,Excel&university=Accra&minGpa=3
 export const applicantsQuery = Joi.object({
   status: Joi.string().valid(...APPLICATION_STATUSES),
   skills: Joi.array()

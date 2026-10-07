@@ -59,7 +59,7 @@ beforeEach(() => {
 });
 
 describe('POST /api/v1/auth/register (US-01)', () => {
-  const body = { fullName: 'Ada Lovelace', email: 'Ada@Example.com', password: PASSWORD, phone: '+254712345678', role: 'student' };
+  const body = { fullName: 'Ada Lovelace', email: 'Ada@Example.com', password: PASSWORD, phone: '+233241234567', role: 'student' };
 
   it('creates a pending account, returns an access token and sets the refresh cookie', async () => {
     User.create.mockImplementation(async (values) => makeUser({ ...values, emailVerifiedAt: null }));
@@ -68,7 +68,7 @@ describe('POST /api/v1/auth/register (US-01)', () => {
 
     expect(res.status).toBe(201);
     expect(res.body.accessToken).toEqual(expect.any(String));
-    expect(res.body.user).toMatchObject({ email: 'ada@example.com', status: 'pending', phoneE164: '+254712345678' });
+    expect(res.body.user).toMatchObject({ email: 'ada@example.com', status: 'pending', phoneE164: '+233241234567' });
     expect(res.body.user).not.toHaveProperty('passwordHash');
 
     const created = User.create.mock.calls[0][0];

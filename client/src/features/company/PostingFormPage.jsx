@@ -25,7 +25,7 @@ const postingSchema = z.object({
   domain: text('Domain', 80),
   durationWeeks: z.string().trim().regex(/^\d+$/, 'Duration is required').refine((v) => Number(v) >= 1 && Number(v) <= 104, 'Duration must be between 1 and 104 weeks'),
   stipend: z.string().trim().regex(/^\d+(\.\d{1,2})?$/, 'Stipend is required (0 for unpaid)'),
-  stipendCurrency: z.string().trim().regex(/^[A-Za-z]{3}$/, 'Use a 3-letter currency code, e.g. KES'),
+  stipendCurrency: z.string().trim().regex(/^[A-Za-z]{3}$/, 'Use a 3-letter currency code, e.g. GHS'),
   deadline: z
     .string()
     .min(1, 'Application deadline is required')
@@ -42,7 +42,7 @@ const toForm = (p) => ({
   domain: p?.domain ?? '',
   durationWeeks: p ? String(p.durationWeeks) : '',
   stipend: p ? String(p.stipend) : '',
-  stipendCurrency: p?.stipendCurrency ?? 'KES',
+  stipendCurrency: p?.stipendCurrency ?? 'GHS',
   deadline: p ? toDay(p.deadline) : '',
   skills: p?.skills ?? [],
 });
@@ -95,7 +95,7 @@ function PostingForm({ posting }) {
       <Card title="Terms">
         <div className="grid-2">
           <Field label="Location" error={e.location?.message}>
-            {(a11y) => <input placeholder="e.g. Nairobi" {...a11y} {...register('location')} />}
+            {(a11y) => <input placeholder="e.g. Accra" {...a11y} {...register('location')} />}
           </Field>
           <Field label="Domain" error={e.domain?.message}>
             {(a11y) => <input placeholder="e.g. Data" {...a11y} {...register('domain')} />}

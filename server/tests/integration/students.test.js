@@ -33,7 +33,7 @@ const student = asRole('student');
 const stored = (overrides = {}) => ({
   userId: 7,
   fullName: 'Ada Lovelace',
-  university: 'University of Nairobi',
+  university: 'University of Ghana',
   department: 'Computer Science',
   gpa: 3.6,
   bio: null,
@@ -89,7 +89,7 @@ describe('GET /api/v1/students/me (US-02)', () => {
 describe('PUT /api/v1/students/me (US-02)', () => {
   const body = {
     fullName: '  Ada Lovelace ',
-    university: 'University of Nairobi',
+    university: 'University of Ghana',
     department: 'Computer Science',
     gpa: 3.6,
     skills: ['React', 'react', ' SQL  Server '],
@@ -106,7 +106,7 @@ describe('PUT /api/v1/students/me (US-02)', () => {
 
     expect(res.status).toBe(200);
     expect(StudentProfile.upsert).toHaveBeenCalledWith(
-      { userId: 7, fullName: 'Ada Lovelace', university: 'University of Nairobi', department: 'Computer Science', gpa: 3.6, bio: null },
+      { userId: 7, fullName: 'Ada Lovelace', university: 'University of Ghana', department: 'Computer Science', gpa: 3.6, bio: null },
       expect.anything(),
     );
     // Duplicates differing only in case are one skill; whitespace is tidied.

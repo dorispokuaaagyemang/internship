@@ -23,9 +23,9 @@ const internship = (overrides = {}) => ({
   endDate: '2026-09-25',
   completedAt: null,
   certificate: null,
-  posting: { id: 9, title: 'Data Analyst Intern', location: 'Nairobi' },
+  posting: { id: 9, title: 'Data Analyst Intern', location: 'Accra' },
   company: { id: 5, name: 'Acme Ltd' },
-  student: { id: 7, email: 'ada@x.co', fullName: 'Ada Lovelace', university: 'UoN', department: 'CS', gpa: 3.6, skills: ['SQL'], hasResume: false },
+  student: { id: 7, email: 'ada@x.co', fullName: 'Ada Lovelace', university: 'UG', department: 'CS', gpa: 3.6, skills: ['SQL'], hasResume: false },
   supervisor: { id: 50, email: 'grace@acme.co', fullName: 'Grace Hopper' },
   viewerRole: 'supervisor',
   ...overrides,
@@ -114,7 +114,7 @@ describe('InternshipPage as the supervisor (US-10, US-11)', () => {
 
 describe('InternshipPage as the student (US-10, US-11)', () => {
   it('shows evaluations read-only, with no form and no completion', async () => {
-    serve({ item: internship({ viewerRole: 'student', student: { id: 7, email: 'ada@x.co', fullName: 'Ada Lovelace', university: 'UoN', department: 'CS' } }) });
+    serve({ item: internship({ viewerRole: 'student', student: { id: 7, email: 'ada@x.co', fullName: 'Ada Lovelace', university: 'UG', department: 'CS' } }) });
     open(as('student', 7));
 
     expect(await screen.findByRole('heading', { name: 'Data Analyst Intern' })).toBeInTheDocument();

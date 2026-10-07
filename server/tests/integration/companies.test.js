@@ -28,10 +28,10 @@ const admin = bearer('admin', 1);
 const repUser = (overrides = {}) => ({
   id: 7,
   role: 'company_rep',
-  email: 'rep@acme.co.ke',
+  email: 'rep@acme.com.gh',
   passwordHash: 'h',
   emailVerifiedAt: new Date(),
-  phoneE164: '+254712345678',
+  phoneE164: '+233241234567',
   ...overrides,
 });
 
@@ -39,7 +39,7 @@ const company = (overrides = {}) => ({
   id: 5,
   name: 'Acme Ltd',
   regNumber: 'PVT-2024/123',
-  contactPhone: '+254712345678',
+  contactPhone: '+233241234567',
   website: null,
   status: 'pending_verification',
   verifiedAt: null,
@@ -56,7 +56,7 @@ beforeEach(() => {
 });
 
 describe('POST /api/v1/companies (US-04)', () => {
-  const body = { name: ' Acme Ltd ', regNumber: 'pvt-2024/123', website: 'https://acme.co.ke' };
+  const body = { name: ' Acme Ltd ', regNumber: 'pvt-2024/123', website: 'https://acme.com.gh' };
   const register = (payload = body, auth = rep) => request(app).post('/api/v1/companies').set('Authorization', auth).send(payload);
 
   it('creates the company as Pending Verification, with the rep\'s number, and audits it', async () => {
@@ -67,7 +67,7 @@ describe('POST /api/v1/companies (US-04)', () => {
     expect(res.status).toBe(201);
     expect(res.body.company).toMatchObject({ name: 'Acme Ltd', regNumber: 'PVT-2024/123', status: 'pending_verification', memberRole: 'rep' });
     expect(Company.create).toHaveBeenCalledWith(
-      { name: 'Acme Ltd', regNumber: 'PVT-2024/123', website: 'https://acme.co.ke', contactPhone: '+254712345678', status: 'pending_verification' },
+      { name: 'Acme Ltd', regNumber: 'PVT-2024/123', website: 'https://acme.com.gh', contactPhone: '+233241234567', status: 'pending_verification' },
       expect.anything(),
     );
     expect(CompanyMember.create).toHaveBeenCalledWith({ companyId: 5, userId: 7, memberRole: 'rep' }, expect.anything());
@@ -92,9 +92,9 @@ describe('POST /api/v1/companies (US-04)', () => {
     expect(missing.status).toBe(422);
     expect(missing.body.error.fields).toEqual({ contactPhone: 'Contact phone is required' });
 
-    const res = await register({ ...body, contactPhone: '+254 733 123456' });
+    const res = await register({ ...body, contactPhone: '+233 20 123 4567' });
     expect(res.status).toBe(201);
-    expect(Company.create.mock.calls[0][0].contactPhone).toBe('+254733123456');
+    expect(Company.create.mock.calls[0][0].contactPhone).toBe('+233201234567');
   });
 
   it('allows one company per account', async () => {
@@ -178,7 +178,7 @@ describe('assertCanPost (US-04 posting gate)', () => {
 describe('GET /api/v1/admin/companies (US-04, US-12)', () => {
   it('lists companies by status, oldest first, with their reps', async () => {
     Company.findAndCountAll.mockResolvedValue({
-      rows: [{ ...company(), members: [{ user: { id: 7, email: 'rep@acme.co.ke', phoneE164: '+254712345678' } }] }],
+      rows: [{ ...company(), members: [{ user: { id: 7, email: 'rep@acme.com.gh', phoneE164: '+233241234567' } }] }],
       count: 1,
     });
 
@@ -186,7 +186,7 @@ describe('GET /api/v1/admin/companies (US-04, US-12)', () => {
 
     expect(res.status).toBe(200);
     expect(res.body).toMatchObject({ page: 1, limit: 20, total: 1 });
-    expect(res.body.items[0]).toMatchObject({ id: 5, reps: [{ id: 7, email: 'rep@acme.co.ke', phone: '+254712345678' }] });
+    expect(res.body.items[0]).toMatchObject({ id: 5, reps: [{ id: 7, email: 'rep@acme.com.gh', phone: '+233241234567' }] });
     expect(Company.findAndCountAll).toHaveBeenCalledWith(
       expect.objectContaining({ where: { status: 'pending_verification' }, order: [['createdAt', 'ASC']], limit: 20, offset: 0 }),
     );
@@ -210,7 +210,7 @@ describe('POST /api/v1/admin/companies/:id/approve (US-04, US-12)', () => {
   beforeEach(() => {
     Company.findByPk.mockResolvedValue(company());
     Company.update.mockResolvedValue([1]);
-    CompanyMember.findAll.mockResolvedValue([{ user: { id: 7, email: 'rep@acme.co.ke' } }]);
+    CompanyMember.findAll.mockResolvedValue([{ user: { id: 7, email: 'rep@acme.com.gh' } }]);
   });
 
   it('verifies the company, records the admin and time, audits it and emails the rep', async () => {
@@ -226,7 +226,7 @@ describe('POST /api/v1/admin/companies/:id/approve (US-04, US-12)', () => {
       expect.objectContaining({ action: 'admin.company_approved', actor: expect.objectContaining({ id: 1, role: 'admin' }), entity: { type: 'company', id: 5 } }),
       expect.anything(),
     );
-    expect(enqueueEmail).toHaveBeenCalledWith('companyApproved', 'rep@acme.co.ke', {
+    expect(enqueueEmail).toHaveBeenCalledWith('companyApproved', 'rep@acme.com.gh', {
       companyName: 'Acme Ltd',
       url: 'http://localhost:5173/company',
     });

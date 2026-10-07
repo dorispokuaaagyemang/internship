@@ -6,7 +6,7 @@ import { api } from '../../lib/api';
 const LAST_UPDATED = '7 October 2026';
 const months = (days) => Math.round(days / 30.4);
 
-// The privacy notice (Kenya Data Protection Act 2019 / GDPR). The controller, contact address and
+// The privacy notice (Ghana Data Protection Act, 2012 (Act 843) / GDPR). The controller, contact address and
 // retention periods come from the server, so the notice matches what the system actually does.
 // docs/DATA-PROTECTION.md is the reviewer's pack; have this reviewed before launch.
 export function PrivacyPage() {
@@ -88,7 +88,7 @@ export function PrivacyPage() {
         </li>
       </ul>
       <p>
-        Some of these providers may store or process data outside Kenya. We only use providers that protect personal data to the standard the law
+        Some of these providers may store or process data outside Ghana. We only use providers that protect personal data to the standard the law
         requires, with appropriate safeguards in place. Ask us for details of where your data is kept.
       </p>
 
@@ -96,7 +96,7 @@ export function PrivacyPage() {
       <p>
         Data travels encrypted (HTTPS). Passwords are stored only as secure hashes. Resumes and certificates are stored encrypted and can be opened
         only through short-lived links after an access check. Access is limited by role, and administrative actions are logged. If a breach puts
-        your data at risk, we will tell the Data Commissioner and, where the law requires, you.
+        your data at risk, we will tell the Data Protection Commission and you as soon as reasonably practicable, as the law requires.
       </p>
 
       <h2>How long we keep it</h2>
@@ -135,8 +135,7 @@ export function PrivacyPage() {
           <strong>Object or restrict:</strong> ask us at {contactLink}; we respond within the time the law requires.
         </li>
         <li>
-          <strong>Complain:</strong> to us first if you can, and to the data protection authority (in Kenya, the Office of the Data Protection
-          Commissioner).
+          <strong>Complain:</strong> to us first if you can, and to the Data Protection Commission of Ghana.
         </li>
       </ul>
 

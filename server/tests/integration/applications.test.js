@@ -48,13 +48,13 @@ const openPosting = (overrides = {}) => ({
   id: 9,
   companyId: 5,
   title: 'Data Analyst Intern',
-  location: 'Nairobi',
+  location: 'Accra',
   status: 'active',
   deadline: new Date(Date.now() + 5 * DAY),
   company: { id: 5, name: 'Acme Ltd' },
   ...overrides,
 });
-const completeProfile = { userId: 7, fullName: 'Ada Lovelace', university: 'University of Nairobi', department: 'CS' };
+const completeProfile = { userId: 7, fullName: 'Ada Lovelace', university: 'University of Ghana', department: 'CS' };
 const application = (overrides = {}) => ({
   id: 30,
   postingId: 9,
@@ -75,7 +75,7 @@ beforeEach(() => {
   Application.create.mockImplementation(async (values) => ({ id: 30, createdAt: new Date(), ...values }));
   Application.update.mockResolvedValue([1]);
   CompanyMember.findOne.mockResolvedValue({ companyId: 5, memberRole: 'rep' });
-  CompanyMember.findAll.mockResolvedValue([{ user: { id: 20, email: 'rep@acme.co.ke' } }]);
+  CompanyMember.findAll.mockResolvedValue([{ user: { id: 20, email: 'rep@acme.com.gh' } }]);
   enqueueEmail.mockResolvedValue({});
 });
 
@@ -207,7 +207,7 @@ describe('GET /api/v1/applications/me (US-07)', () => {
 describe('GET /api/v1/applications/:id', () => {
   const detailed = (overrides) =>
     application({
-      profile: { userId: 7, fullName: 'Ada Lovelace', university: 'UoN', department: 'CS', gpa: 3.6, resumeFileId: 4, skills: [{ name: 'SQL' }] },
+      profile: { userId: 7, fullName: 'Ada Lovelace', university: 'UG', department: 'CS', gpa: 3.6, resumeFileId: 4, skills: [{ name: 'SQL' }] },
       student: { id: 7, email: 'ada@example.com' },
       history: [{ fromStatus: null, toStatus: 'applied', createdAt: new Date('2026-10-06T09:00:00Z'), note: null }],
       ...overrides,
@@ -259,7 +259,7 @@ describe('POST /api/v1/applications/:id/withdraw (US-08)', () => {
       expect.objectContaining({ fromStatus: status, toStatus: 'withdrawn', changedBy: 7 }),
       expect.anything(),
     );
-    expect(enqueueEmail).toHaveBeenCalledWith('applicationWithdrawn', 'rep@acme.co.ke', expect.objectContaining({ studentName: 'Ada Lovelace' }));
+    expect(enqueueEmail).toHaveBeenCalledWith('applicationWithdrawn', 'rep@acme.com.gh', expect.objectContaining({ studentName: 'Ada Lovelace' }));
     expect(Notification.bulkCreate).toHaveBeenCalledWith([
       { userId: 20, type: 'application.withdrawn', payload: expect.objectContaining({ applicationId: 30, studentName: 'Ada Lovelace' }) },
     ]);
@@ -346,7 +346,7 @@ describe('GET /api/v1/postings/:id/applications (US-06)', () => {
     Application.findAndCountAll.mockResolvedValue({ rows: [{ id: 30 }], count: 1 });
     Application.findAll.mockResolvedValue([
       application({
-        profile: { userId: 7, fullName: 'Ada Lovelace', university: 'University of Nairobi', department: 'CS', gpa: 3.6, resumeFileId: null, skills: [{ name: 'SQL' }] },
+        profile: { userId: 7, fullName: 'Ada Lovelace', university: 'University of Ghana', department: 'CS', gpa: 3.6, resumeFileId: null, skills: [{ name: 'SQL' }] },
         student: { id: 7, email: 'ada@example.com' },
       }),
     ]);
@@ -360,7 +360,7 @@ describe('GET /api/v1/postings/:id/applications (US-06)', () => {
   });
 
   it('filters by every listed skill, university (contains) and minimum GPA', async () => {
-    await list('?skills=SQL,excel&skills=sql&university=Nairobi&minGpa=3.2');
+    await list('?skills=SQL,excel&skills=sql&university=Accra&minGpa=3.2');
 
     const query = Application.findAndCountAll.mock.calls[0][0];
     const skillSql = query.where[Op.and][0].literal;
@@ -369,7 +369,7 @@ describe('GET /api/v1/postings/:id/applications (US-06)', () => {
     expect(query.include[0]).toMatchObject({
       as: 'profile',
       required: true,
-      where: { university: { [Op.like]: '%Nairobi%' }, gpa: { [Op.gte]: 3.2 } },
+      where: { university: { [Op.like]: '%Accra%' }, gpa: { [Op.gte]: 3.2 } },
     });
   });
 

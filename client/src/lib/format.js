@@ -1,6 +1,6 @@
 // Display helpers shared by the portals.
 
-export function money(amount, currency = 'KES') {
+export function money(amount, currency = 'GHS') {
   if (amount === 0) return 'Unpaid';
   try {
     return new Intl.NumberFormat(undefined, { style: 'currency', currency, maximumFractionDigits: 0 }).format(amount);

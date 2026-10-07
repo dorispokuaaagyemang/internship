@@ -14,18 +14,18 @@ vi.mock('../../lib/api', async (importOriginal) => {
   return { ...actual, api: { get: vi.fn(), post: vi.fn(), put: vi.fn(), patch: vi.fn(), delete: vi.fn() } };
 });
 
-const rep = makeAuth({ user: { id: 20, email: 'rep@acme.co.ke', role: 'company_rep', status: 'active', phoneE164: '+254712345678' } });
+const rep = makeAuth({ user: { id: 20, email: 'rep@acme.com.gh', role: 'company_rep', status: 'active', phoneE164: '+233241234567' } });
 const apiFailure = (status, code, message, fields) => Object.assign(new Error(message), { response: { status, data: { error: { code, message, fields } } } });
-const company = (overrides) => ({ id: 5, name: 'Acme Ltd', regNumber: 'PVT-1', contactPhone: '+254712345678', status: 'verified', ...overrides });
+const company = (overrides) => ({ id: 5, name: 'Acme Ltd', regNumber: 'PVT-1', contactPhone: '+233241234567', status: 'verified', ...overrides });
 const posting = (overrides) => ({
   id: 9,
   title: 'Data Analyst Intern',
   description: 'Work with data.',
-  location: 'Nairobi',
+  location: 'Accra',
   domain: 'Data',
   durationWeeks: 12,
   stipend: 15000,
-  stipendCurrency: 'KES',
+  stipendCurrency: 'GHS',
   deadline: new Date(Date.now() + 10 * 86_400_000).toISOString(),
   status: 'draft',
   skills: ['SQL'],
@@ -48,7 +48,7 @@ describe('CompanyDashboard (US-04)', () => {
     await userEvent.click(screen.getByRole('button', { name: 'Submit for verification' }));
 
     // The contact phone is pre-filled with the rep's own number.
-    expect(api.post).toHaveBeenCalledWith('/companies', { name: 'Acme Ltd', regNumber: 'PVT-1', contactPhone: '+254712345678', website: null });
+    expect(api.post).toHaveBeenCalledWith('/companies', { name: 'Acme Ltd', regNumber: 'PVT-1', contactPhone: '+233241234567', website: null });
     expect(await screen.findByText(/awaiting admin verification/)).toBeInTheDocument();
     expect(screen.queryByRole('link', { name: 'New posting' })).not.toBeInTheDocument();
   });
@@ -95,7 +95,7 @@ describe('PostingFormPage (US-05)', () => {
     await userEvent.type(screen.getByLabelText('Title'), 'Data Analyst Intern');
     await userEvent.type(screen.getByLabelText('Description'), 'Work with data.');
     await userEvent.type(screen.getByLabelText('Required skills'), 'SQL{Enter}');
-    await userEvent.type(screen.getByLabelText('Location'), 'Nairobi');
+    await userEvent.type(screen.getByLabelText('Location'), 'Accra');
     await userEvent.type(screen.getByLabelText('Domain'), 'Data');
     await userEvent.type(screen.getByLabelText('Duration (weeks)'), '12');
     await userEvent.type(screen.getByLabelText('Monthly stipend'), '0');
@@ -153,7 +153,7 @@ describe('ApplicantsPage (US-06)', () => {
         ? { data: { posting: posting({ status: 'active' }) } }
         : {
             data: {
-              items: [{ id: 30, status: 'applied', createdAt: '2026-10-06T09:00:00Z', student: { fullName: 'Ada Lovelace', email: 'ada@x.co', university: 'UoN', department: 'CS', gpa: 3.6, skills: ['SQL', 'Excel'], hasResume: true } }],
+              items: [{ id: 30, status: 'applied', createdAt: '2026-10-06T09:00:00Z', student: { fullName: 'Ada Lovelace', email: 'ada@x.co', university: 'UG', department: 'CS', gpa: 3.6, skills: ['SQL', 'Excel'], hasResume: true } }],
               total: 1,
               page: 1,
               limit: 20,
@@ -176,7 +176,7 @@ describe('ApplicantPage (US-06, US-07)', () => {
     status: 'applied',
     coverLetter: 'Hello',
     posting: { id: 9, title: 'Data Analyst Intern' },
-    student: { fullName: 'Ada Lovelace', email: 'ada@x.co', university: 'UoN', department: 'CS', gpa: 3.6, skills: ['SQL'], hasResume: false },
+    student: { fullName: 'Ada Lovelace', email: 'ada@x.co', university: 'UG', department: 'CS', gpa: 3.6, skills: ['SQL'], hasResume: false },
     history: [{ from: null, to: 'applied', at: '2026-10-06T09:00:00Z', note: null }],
     allowedActions: ['shortlisted', 'interviewed', 'rejected'],
     ...overrides,
