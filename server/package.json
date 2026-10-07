@@ -15,7 +15,8 @@
     "db:migrate:undo": "sequelize-cli db:migrate:undo",
     "db:seed": "sequelize-cli db:seed:all",
     "admin:create": "node scripts/create-admin.js",
-    "db:seed:demo": "node scripts/seed-demo.js"
+    "db:seed:demo": "node scripts/seed-demo.js",
+    "mail:test": "node scripts/test-email.js"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.1141.0",

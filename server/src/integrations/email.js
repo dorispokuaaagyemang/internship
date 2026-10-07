@@ -10,11 +10,17 @@ function getTransport() {
   return transport;
 }
 
+// Reserved for examples and testing (RFC 2606, RFC 6761): no mailbox exists there. The demo seed
+// uses @demo.example.com and erased accounts @deleted.invalid; sending would only bounce and hurt
+// the sender's reputation with the provider.
+const RESERVED = /@(?:[^@]+\.)?(?:example\.(?:com|net|org)|example|invalid|test|localhost)$/i;
+export const isReservedAddress = (to) => RESERVED.test(to.trim());
+
 export async function sendEmail({ to, subject, text, html }) {
   const message = { from: config.mail.from, to, subject, text, html };
   const smtp = getTransport();
-  if (!smtp) {
-    logger.info({ to, subject, text }, 'Email (SMTP_HOST not set, not sent)');
+  if (!smtp || isReservedAddress(to)) {
+    logger.info({ to, subject, text }, smtp ? 'Email to a reserved test domain, not sent' : 'Email (SMTP_HOST not set, not sent)');
     return { logged: true };
   }
   const info = await smtp.sendMail(message);
