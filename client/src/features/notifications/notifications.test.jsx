@@ -35,7 +35,7 @@ describe('describeNotification', () => {
 
   it('US-07: marks the application lists stale so open pages update', () => {
     expect(queriesToRefresh(statusChanged)).toEqual([['notifications'], ['applications']]);
-    expect(queriesToRefresh({ type: 'company.approved' })).toEqual([['notifications'], ['company']]);
+    expect(queriesToRefresh({ type: 'company.approved' })).toEqual([['notifications'], ['company'], ['company-postings']]);
   });
 });
 

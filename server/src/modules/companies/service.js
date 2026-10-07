@@ -4,7 +4,7 @@ import { AppError } from '../../lib/errors.js';
 import { emit } from '../../lib/events.js';
 import logger from '../../lib/logger.js';
 import { generateOpaqueToken, hashToken } from '../../lib/tokens.js';
-import { sequelize, User, Company, CompanyMember, AccountInvite, SupervisorAssignment } from '../../db/models/index.js';
+import { sequelize, User, Company, CompanyMember, AccountInvite, SupervisorAssignment, Posting } from '../../db/models/index.js';
 import { enqueueEmail } from '../../jobs/queues.js';
 import { record } from '../audit/service.js';
 
@@ -231,4 +231,39 @@ export async function listStaff(repId) {
   });
   const load = new Map(counts.map((c) => [c.supervisorUserId, Number(c.n)]));
   return members.map((m) => staffMember(m, m.user, load.get(m.userId) ?? 0));
+}
+
+// --- Suspension (US-12) ---
+// A suspended company can't post (assertCanPost) and its open postings close at once, so no
+// more applications arrive. Reinstating restores its previous standing; postings stay closed.
+
+export async function suspendCompany(admin, companyId, { reason }, { ip }) {
+  const company = await Company.findByPk(companyId);
+  if (!company) throw new AppError(404, 'COMPANY_NOT_FOUND', 'Company not found');
+  if (company.status === 'suspended') throw new AppError(409, 'ALREADY_SUSPENDED', 'This company is already suspended');
+  const now = new Date();
+  let closed = 0;
+  await sequelize.transaction(async (transaction) => {
+    await company.update({ status: 'suspended' }, { transaction });
+    [closed] = await Posting.update({ status: 'closed', closedAt: now }, { where: { companyId: company.id, status: 'active' }, transaction });
+    await record(
+      { actor: { id: admin.id, role: 'admin' }, action: 'admin.company_suspended', entity: { type: 'company', id: company.id }, ip, metadata: { reason, postingsClosed: closed } },
+      { transaction },
+    );
+  });
+  await emit('company.suspended', { company, reason });
+  return { ...serialize(company), postingsClosed: closed };
+}
+
+export async function reinstateCompany(admin, companyId, { ip }) {
+  const company = await Company.findByPk(companyId);
+  if (!company) throw new AppError(404, 'COMPANY_NOT_FOUND', 'Company not found');
+  if (company.status !== 'suspended') throw new AppError(409, 'NOT_SUSPENDED', 'This company is not suspended');
+  const status = company.verifiedAt ? 'verified' : 'pending_verification';
+  await sequelize.transaction(async (transaction) => {
+    await company.update({ status }, { transaction });
+    await record({ actor: { id: admin.id, role: 'admin' }, action: 'admin.company_reinstated', entity: { type: 'company', id: company.id }, ip }, { transaction });
+  });
+  await emit('company.reinstated', { company });
+  return serialize(company);
 }

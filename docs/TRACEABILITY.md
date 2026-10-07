@@ -76,9 +76,9 @@ This file maps every user story and non-functional requirement in [ACCEPTANCE.md
 
 | Story | Acceptance criterion | Endpoint(s) | Tables | Enforcement / job |
 |---|---|---|---|---|
-| US-12 | Dashboard counts | `GET /admin/stats` | users, companies, postings, applications | COUNT queries, 60 s Redis cache |
-| US-12 | Suspension removes privileges immediately | `POST /admin/users/:id/suspend` | users.status, refresh_tokens | `authenticate` checks status on every request (30 s Redis cache, cleared by `invalidateUserStatus()`); login and refresh refuse suspended accounts; token revocation |
-| US-12 | Admin actions audited | All `/admin/*` mutations | audit_logs | `auditService.log()`, insert-only grants |
+| US-12 | Dashboard counts | `GET /admin/stats` | users, companies, postings, applications | Grouped COUNT queries, cached 60 s in Redis (`admin:stats`), computed directly if Redis is down |
+| US-12 | Suspension removes privileges immediately | `POST /admin/users/:id/suspend` (reason required), `/reinstate`, `DELETE /admin/users/:id`; `POST /admin/companies/:id/suspend`, `/reinstate` | users.status, refresh_tokens, companies.status, postings | Status cache cleared (next request 403), refresh tokens revoked, sockets dropped (`disconnectUser`); a suspended company can't post and its active postings close. Admin accounts can't be changed here |
+| US-12 | Admin actions audited | All `/admin/*` mutations; `GET /admin/audit-logs?action&actorId&entityType&entityId&from&to` | audit_logs | `record()` in each service with the admin id, IP and the reason; `AuditLog` refuses update/destroy; viewer filters by exact action or prefix (`admin.`) |
 
 ## Non-Functional Requirements
 

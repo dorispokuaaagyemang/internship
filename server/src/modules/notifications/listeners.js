@@ -135,3 +135,14 @@ on('certificate.issued', ({ internship, certificate }) =>
       }),
   ]),
 );
+
+// US-12: the company's reps learn about a suspension or reinstatement in-app.
+on('company.suspended', async ({ company }) => {
+  const reps = await companyReps(company.id);
+  await notify(reps.map((r) => r.id), 'company.suspended', { companyId: company.id, companyName: company.name });
+});
+
+on('company.reinstated', async ({ company }) => {
+  const reps = await companyReps(company.id);
+  await notify(reps.map((r) => r.id), 'company.reinstated', { companyId: company.id, companyName: company.name, status: company.status });
+});

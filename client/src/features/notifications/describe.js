@@ -35,6 +35,15 @@ const DESCRIBE = {
     text: `Your certificate for ${p.postingTitle} is ready to download.`,
     to: `/my-internships/${p.internshipId}`,
   }),
+  // US-12
+  'company.suspended': (p) => ({
+    text: `${p.companyName} has been suspended by an admin. Its postings are closed.`,
+    to: '/company',
+  }),
+  'company.reinstated': (p) => ({
+    text: `${p.companyName} has been reinstated.`,
+    to: '/company',
+  }),
   'company.approved': (p) => ({
     text: `${p.companyName} is verified. You can now post internships.`,
     to: '/company/postings/new',
@@ -50,7 +59,7 @@ export function describeNotification(notification) {
 export function queriesToRefresh(notification) {
   const keys = [['notifications']];
   if (notification.type.startsWith('application.')) keys.push(['applications']);
-  if (notification.type === 'company.approved') keys.push(['company']);
+  if (notification.type.startsWith('company.')) keys.push(['company'], ['company-postings']);
   const internshipEvents = ['supervisor.assigned', 'intern.assigned', 'evaluation.submitted', 'certificate.issued'];
   // Accepting an application creates the internship (US-09).
   if (internshipEvents.includes(notification.type) || notification.payload?.to === 'accepted') {

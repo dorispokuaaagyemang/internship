@@ -561,7 +561,7 @@ The API also refuses applications after a posting's deadline, so no application 
 | supervision | `GET /internships` (role-aware: own, company's, or the supervisor's current interns), `GET /internships/:id`, `PATCH /internships/:id/dates`, `POST /internships/:id/supervisor`, `GET`/`POST /internships/:id/evaluations`, `GET /internships/:id/resume`. Accepting an application (`PATCH /applications/:id/status`, optional `startDate`) creates the internship |
 | certificates | `POST /internships/:id/complete`, `GET /certificates/:id/download` |
 | notifications | `GET /notifications`, `PATCH /notifications/:id/read` |
-| admin | `GET /admin/stats`, `GET /admin/users`, `GET /admin/companies?status=pending_verification`, `POST /admin/companies/:id/approve`, `POST /admin/users/:id/suspend`, `POST /admin/users/:id/reinstate`, `DELETE /admin/users/:id`, `GET /admin/audit-logs` |
+| admin | `GET /admin/stats`, `GET /admin/users?q&role&status`, `POST /admin/users/:id/suspend`, `POST /admin/users/:id/reinstate`, `DELETE /admin/users/:id`, `GET /admin/companies?status=`, `POST /admin/companies/:id/approve`, `POST /admin/companies/:id/suspend`, `POST /admin/companies/:id/reinstate`, `GET /admin/audit-logs` |
 | system | `GET /health` |
 
 **Conventions:**

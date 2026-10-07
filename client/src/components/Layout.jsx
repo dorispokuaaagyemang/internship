@@ -23,7 +23,12 @@ const NAV = {
     { to: '/company/staff', label: 'Staff' },
   ],
   supervisor: [{ to: '/supervisor', label: 'My interns' }],
-  admin: [{ to: '/admin', label: 'Dashboard', end: true }],
+  admin: [
+    { to: '/admin', label: 'Overview', end: true },
+    { to: '/admin/companies', label: 'Companies' },
+    { to: '/admin/users', label: 'Users' },
+    { to: '/admin/audit', label: 'Audit log' },
+  ],
 };
 
 export function Layout() {

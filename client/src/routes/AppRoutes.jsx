@@ -30,7 +30,10 @@ const PostingFormPage = named(() => import('../features/company/PostingFormPage'
 const ApplicantsPage = named(() => import('../features/company/ApplicantsPage'), 'ApplicantsPage');
 const ApplicantPage = named(() => import('../features/company/ApplicantPage'), 'ApplicantPage');
 
-const AdminDashboard = named(() => import('../features/admin/AdminDashboard'), 'AdminDashboard');
+const AdminOverview = named(() => import('../features/admin/OverviewPage'), 'OverviewPage');
+const AdminCompanies = named(() => import('../features/admin/CompaniesPage'), 'CompaniesPage');
+const AdminUsers = named(() => import('../features/admin/UsersPage'), 'UsersPage');
+const AdminAudit = named(() => import('../features/admin/AuditPage'), 'AuditPage');
 
 const internship = (name) => named(() => import('../features/internships/pages'), name);
 const StudentInternships = internship('StudentInternships');
@@ -91,7 +94,10 @@ export function AppRoutes() {
               <Route path="/supervisor/interns/:id" element={<SupervisorIntern />} />
             </Route>
             <Route element={<RequireRole roles={['admin']} />}>
-              <Route path="/admin" element={<AdminDashboard />} />
+              <Route path="/admin" element={<AdminOverview />} />
+              <Route path="/admin/companies" element={<AdminCompanies />} />
+              <Route path="/admin/users" element={<AdminUsers />} />
+              <Route path="/admin/audit" element={<AdminAudit />} />
             </Route>
           </Route>
         </Route>
