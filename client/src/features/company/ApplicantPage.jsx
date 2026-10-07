@@ -21,6 +21,8 @@ export function ApplicantPage() {
   const { data: application, isPending, isError } = useApplication(id);
   const change = useChangeStatus(id);
   const [note, setNote] = useState('');
+  // US-09: accepting starts the internship; empty means today.
+  const [startDate, setStartDate] = useState('');
   const [message, setMessage] = useState(null);
 
   if (isPending) return <PageLoading />;
@@ -39,9 +41,15 @@ export function ApplicantPage() {
     if (status === 'rejected' && !window.confirm(`Reject ${student.fullName ?? 'this applicant'}? They will be notified.`)) return;
     setMessage(null);
     try {
-      await change.mutateAsync({ status, note: note.trim() || undefined });
+      const accepting = status === 'accepted';
+      await change.mutateAsync({ status, note: note.trim() || undefined, ...(accepting && startDate && { startDate }) });
       setNote('');
-      setMessage({ tone: 'success', text: `Moved to ${statusLabel(status)}. The student has been notified.` });
+      setMessage({
+        tone: 'success',
+        text: accepting
+          ? 'Accepted. The internship has started, and the student has been notified. Assign a supervisor from Interns.'
+          : `Moved to ${statusLabel(status)}. The student has been notified.`,
+      });
     } catch (err) {
       setMessage({ tone: 'error', text: apiError(err).message });
     }
@@ -123,6 +131,11 @@ export function ApplicantPage() {
             <Field label="Note to include (optional)" hint="Saved with the status change and shown to the student.">
               {(a11y) => <input maxLength={500} value={note} onChange={(e) => setNote(e.target.value)} {...a11y} />}
             </Field>
+            {application.allowedActions.includes('accepted') && (
+              <Field label="Internship start date (if accepting)" hint="Leave empty to start today. It runs for the posting's duration; you can change the dates later.">
+                {(a11y) => <input type="date" className="input--short-date" value={startDate} onChange={(e) => setStartDate(e.target.value)} {...a11y} />}
+              </Field>
+            )}
             <div className="inline-actions">
               {application.allowedActions.map((status) => (
                 <Button key={status} variant={ACTIONS[status]?.variant ?? 'secondary'} busy={change.isPending && change.variables?.status === status} onClick={() => move(status)}>

@@ -13,9 +13,9 @@ const LoginPage = named(() => import('../features/auth/LoginPage'), 'LoginPage')
 const RegisterPage = named(() => import('../features/auth/RegisterPage'), 'RegisterPage');
 const VerifyPage = named(() => import('../features/auth/VerifyPage'), 'VerifyPage');
 const AuthCompletePage = named(() => import('../features/auth/AuthCompletePage'), 'AuthCompletePage');
+const AcceptInvitePage = named(() => import('../features/auth/AcceptInvitePage'), 'AcceptInvitePage');
 
 const NotificationsPage = named(() => import('../features/notifications/NotificationsPage'), 'NotificationsPage');
-const DashboardPage = named(() => import('../pages/DashboardPage'), 'DashboardPage');
 
 const StudentDashboard = named(() => import('../features/student/StudentDashboard'), 'StudentDashboard');
 const ProfilePage = named(() => import('../features/student/ProfilePage'), 'ProfilePage');
@@ -32,6 +32,15 @@ const ApplicantPage = named(() => import('../features/company/ApplicantPage'), '
 
 const AdminDashboard = named(() => import('../features/admin/AdminDashboard'), 'AdminDashboard');
 
+const internship = (name) => named(() => import('../features/internships/pages'), name);
+const StudentInternships = internship('StudentInternships');
+const StudentInternship = internship('StudentInternship');
+const CompanyInterns = internship('CompanyInterns');
+const CompanyIntern = internship('CompanyIntern');
+const SupervisorInterns = internship('SupervisorInterns');
+const SupervisorIntern = internship('SupervisorIntern');
+const StaffPage = named(() => import('../features/internships/StaffPage'), 'StaffPage');
+
 // One SPA, four role portals (ARCHITECTURE.md §9). Guards: signed in -> verified -> role.
 // The API enforces the same rules; these only decide what to show.
 export function AppRoutes() {
@@ -45,6 +54,8 @@ export function AppRoutes() {
           <Route path="/register" element={<RegisterPage />} />
         </Route>
         <Route path="/auth/complete" element={<AuthCompletePage />} />
+        {/* US-09: the link a company emails to a new supervisor. */}
+        <Route path="/accept-invite/:token" element={<AcceptInvitePage />} />
 
         {/* US-03: anyone can browse; applying needs a verified student (checked on the page and by the API). */}
         <Route path="/internships" element={<SearchPage />} />
@@ -61,6 +72,8 @@ export function AppRoutes() {
               <Route path="/profile" element={<ProfilePage />} />
               <Route path="/applications" element={<ApplicationsPage />} />
               <Route path="/applications/:id" element={<ApplicationPage />} />
+              <Route path="/my-internships" element={<StudentInternships />} />
+              <Route path="/my-internships/:id" element={<StudentInternship />} />
             </Route>
             <Route element={<RequireRole roles={['company_rep']} />}>
               <Route path="/company" element={<CompanyDashboard />} />
@@ -69,9 +82,13 @@ export function AppRoutes() {
               <Route path="/company/postings/:id/edit" element={<PostingFormPage />} />
               <Route path="/company/postings/:id/applications" element={<ApplicantsPage />} />
               <Route path="/company/postings/:postingId/applications/:id" element={<ApplicantPage />} />
+              <Route path="/company/interns" element={<CompanyInterns />} />
+              <Route path="/company/interns/:id" element={<CompanyIntern />} />
+              <Route path="/company/staff" element={<StaffPage />} />
             </Route>
             <Route element={<RequireRole roles={['supervisor']} />}>
-              <Route path="/supervisor" element={<DashboardPage />} />
+              <Route path="/supervisor" element={<SupervisorInterns />} />
+              <Route path="/supervisor/interns/:id" element={<SupervisorIntern />} />
             </Route>
             <Route element={<RequireRole roles={['admin']} />}>
               <Route path="/admin" element={<AdminDashboard />} />

@@ -873,3 +873,70 @@ h2 + .tags__list,
   border-bottom-color: var(--primary);
   font-weight: 600;
 }
+
+/* Supervision (US-09..US-11) */
+.choice--inline {
+  flex-direction: row;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.25rem 1rem;
+}
+
+.choice--inline legend {
+  width: 100%;
+}
+
+.input--short-date {
+  max-width: 12rem;
+}
+
+.evaluations {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.evaluation {
+  border-top: 1px solid var(--border);
+  padding: 0.75rem 0;
+}
+
+.evaluation:first-child {
+  border-top: none;
+  padding-top: 0;
+}
+
+.evaluation header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.evaluation p {
+  margin: 0.15rem 0 0.4rem;
+}
+
+.evaluation .prose {
+  margin-bottom: 0;
+}
+
+.rating {
+  color: #f59f00;
+  letter-spacing: 0.1em;
+  margin-left: auto;
+}
+
+.rating__empty {
+  color: var(--border);
+}
+
+.badge--ongoing,
+.badge--invited {
+  background: var(--warning-bg);
+}
+
+.badge--completed {
+  background: var(--success-bg);
+  color: var(--success);
+}

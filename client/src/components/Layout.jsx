@@ -13,13 +13,16 @@ const NAV = {
     { to: '/student', label: 'Dashboard', end: true },
     { to: '/internships', label: 'Find internships' },
     { to: '/applications', label: 'My applications' },
+    { to: '/my-internships', label: 'Internships' },
     { to: '/profile', label: 'Profile' },
   ],
   company_rep: [
     { to: '/company', label: 'Dashboard', end: true },
     { to: '/company/postings', label: 'Postings' },
+    { to: '/company/interns', label: 'Interns' },
+    { to: '/company/staff', label: 'Staff' },
   ],
-  supervisor: [{ to: '/supervisor', label: 'Dashboard', end: true }],
+  supervisor: [{ to: '/supervisor', label: 'My interns' }],
   admin: [{ to: '/admin', label: 'Dashboard', end: true }],
 };
 

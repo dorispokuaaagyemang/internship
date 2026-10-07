@@ -10,8 +10,8 @@ Roadmap phases 1-5 are done on the server, and the client covers them:
 - Phase 3: student profile and resume upload (`modules/students`, `files`), company registration and admin approval (`modules/companies`, `modules/admin`, `npm run admin:create -w server -- <email>`).
 - Phase 4: postings with search and auto-close (`modules/postings`, `maintenance` queue), applications with the `TRANSITIONS` table (`modules/applications`).
 - Phase 5: notifications table, `lib/events.js` domain events, Socket.IO (`lib/realtime.js`).
-- Client: auth pages, guards, notification bell; student, company and admin portals, each lazy-loaded.
-- Phase 6 (supervision) is in progress. Slice 1 is done on the server: staff invites (`/companies/me/staff`, `account_invites`, `/auth/invite/*`; an invited supervisor activates by setting a password through the emailed link), internships created on Accept (`lib/dates.js`, DATEONLY 'YYYY-MM-DD'), `modules/internships` (role-aware access, dates, supervisor assignment with the VIRTUAL `active_key`, append-only evaluations). Next: certificates (slice 2, needs storage), then the supervisor portal and the internship pages in the client.
+- Client: auth pages, guards, notification bell; student, company, supervisor and admin portals, each lazy-loaded.
+- Phase 6 (supervision) is done. Server: staff invites (`/companies/me/staff`, `account_invites`, `/auth/invite/*`; an invited supervisor activates by setting a password through the emailed link), internships created on Accept (`lib/dates.js`, DATEONLY 'YYYY-MM-DD'), `modules/internships` (role-aware access, dates, supervisor assignment with the VIRTUAL `active_key`, append-only evaluations, completion), certificates (`integrations/pdf.js`, `certificates` queue, idempotent `generateCertificate()`, 10-minute sweep). Client: `/accept-invite/:token`, `features/internships` (one `InternshipPage` for student/company/supervisor via `viewerRole`, `StaffPage`), routes `/my-internships`, `/company/interns`, `/company/staff`, `/supervisor`. Next: phase 7 (admin dashboard stats, suspension, audit log viewer, hardening).
 
 ## Commands
 

@@ -18,6 +18,23 @@ const DESCRIBE = {
     text: `${p.studentName} withdrew their application for ${p.postingTitle}.`,
     to: `/company/postings/${p.postingId}/applications/${p.applicationId}`,
   }),
+  // US-09..US-11
+  'supervisor.assigned': (p) => ({
+    text: `${p.supervisorName} is now your supervisor for ${p.postingTitle}.`,
+    to: `/my-internships/${p.internshipId}`,
+  }),
+  'intern.assigned': (p) => ({
+    text: `${p.studentName} (${p.postingTitle}) is now assigned to you.`,
+    to: `/supervisor/interns/${p.internshipId}`,
+  }),
+  'evaluation.submitted': (p) => ({
+    text: `New ${p.isFinal ? 'final ' : ''}evaluation for ${p.postingTitle}: ${p.period}, rated ${p.rating}/5.`,
+    to: `/my-internships/${p.internshipId}`,
+  }),
+  'certificate.issued': (p) => ({
+    text: `Your certificate for ${p.postingTitle} is ready to download.`,
+    to: `/my-internships/${p.internshipId}`,
+  }),
   'company.approved': (p) => ({
     text: `${p.companyName} is verified. You can now post internships.`,
     to: '/company/postings/new',
@@ -34,5 +51,10 @@ export function queriesToRefresh(notification) {
   const keys = [['notifications']];
   if (notification.type.startsWith('application.')) keys.push(['applications']);
   if (notification.type === 'company.approved') keys.push(['company']);
+  const internshipEvents = ['supervisor.assigned', 'intern.assigned', 'evaluation.submitted', 'certificate.issued'];
+  // Accepting an application creates the internship (US-09).
+  if (internshipEvents.includes(notification.type) || notification.payload?.to === 'accepted') {
+    keys.push(['internships']);
+  }
   return keys;
 }
