@@ -122,17 +122,19 @@ const BIOS = {
 };
 
 // [key, company, title, domain, location, weeks, stipend (GHS), status, deadline (days from today), skills]
+// Every future date (deadlines, internship dates) is at least 4 weeks ahead, so the demo stays usable;
+// only records that are over by definition (closed postings, ended internships) lie in the past.
 const POSTINGS = [
-  ['frontend', 'volta', 'Frontend Developer Intern', 'Software Engineering', 'Accra', 12, 1500, 'active', 21, ['JavaScript', 'React']],
-  ['backend', 'volta', 'Backend Developer Intern (Node.js)', 'Software Engineering', 'Accra (hybrid)', 12, 1500, 'active', 30, ['Node.js', 'SQL', 'JavaScript']],
-  ['mobile', 'volta', 'Mobile App Development Intern', 'Software Engineering', 'Accra', 10, 1200, 'draft', 45, ['Mobile Development', 'Java']],
+  ['frontend', 'volta', 'Frontend Developer Intern', 'Software Engineering', 'Accra', 12, 1500, 'active', 35, ['JavaScript', 'React']],
+  ['backend', 'volta', 'Backend Developer Intern (Node.js)', 'Software Engineering', 'Accra (hybrid)', 12, 1500, 'active', 42, ['Node.js', 'SQL', 'JavaScript']],
+  ['mobile', 'volta', 'Mobile App Development Intern', 'Software Engineering', 'Accra', 10, 1200, 'draft', 60, ['Mobile Development', 'Java']],
   ['swe2026', 'volta', 'Software Engineering Intern, 2026 cohort', 'Software Engineering', 'Accra', 12, 1400, 'closed', -60, ['JavaScript', 'Node.js']],
-  ['analyst', 'agritech', 'Data Analyst Intern', 'Data & Analytics', 'Kumasi', 16, 1200, 'active', 14, ['Data Analysis', 'Python', 'Excel']],
-  ['field', 'agritech', 'Field Research Assistant', 'Agriculture', 'Kumasi and Ashanti Region', 8, 800, 'active', 7, ['Communication', 'Excel']],
+  ['analyst', 'agritech', 'Data Analyst Intern', 'Data & Analytics', 'Kumasi', 16, 1200, 'active', 30, ['Data Analysis', 'Python', 'Excel']],
+  ['field', 'agritech', 'Field Research Assistant', 'Agriculture', 'Kumasi and Ashanti Region', 8, 800, 'active', 28, ['Communication', 'Excel']],
   ['agribiz', 'agritech', 'Agribusiness Intern', 'Agriculture', 'Kumasi', 12, 1000, 'closed', -120, ['Data Analysis', 'Excel']],
-  ['supply', 'harbour', 'Supply Chain Intern', 'Logistics', 'Tema', 12, 1000, 'active', 25, ['Project Management', 'Excel']],
-  ['finance', 'harbour', 'Finance and Accounts Intern', 'Finance', 'Tema', 12, 1000, 'active', 10, ['Accounting', 'Excel']],
-  ['itsupport', 'harbour', 'IT Support Intern', 'Information Technology', 'Tema', 10, 900, 'draft', 40, ['Networking']],
+  ['supply', 'harbour', 'Supply Chain Intern', 'Logistics', 'Tema', 12, 1000, 'active', 49, ['Project Management', 'Excel']],
+  ['finance', 'harbour', 'Finance and Accounts Intern', 'Finance', 'Tema', 12, 1000, 'active', 56, ['Accounting', 'Excel']],
+  ['itsupport', 'harbour', 'IT Support Intern', 'Information Technology', 'Tema', 10, 900, 'draft', 70, ['Networking']],
 ];
 
 const DESCRIPTIONS = {
@@ -407,8 +409,8 @@ async function seedDemo() {
       },
       opts,
     );
-    // 2. Just started, no supervisor yet: the rep can assign one.
-    await internship('unassigned', 'fatima.alhassan/swe2026', -3, 12);
+    // 2. Starts in four weeks, no supervisor yet: the rep can assign one.
+    await internship('unassigned', 'fatima.alhassan/swe2026', 28, 12);
     // 3. Ended two days ago without a final evaluation: the supervisor is reminded.
     const ended = await internship('ended', 'kwabena.adjei/swe2026', -85, 12);
     await assign(ended, yawB, volta, daysAgo(85));
