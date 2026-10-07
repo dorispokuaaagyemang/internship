@@ -14,6 +14,14 @@ Roadmap phases 1-5 are done on the server, and the client covers them:
 - Phase 6 (supervision) is done. Server: staff invites (`/companies/me/staff`, `account_invites`, `/auth/invite/*`; an invited supervisor activates by setting a password through the emailed link), internships created on Accept (`lib/dates.js`, DATEONLY 'YYYY-MM-DD'), `modules/internships` (role-aware access, dates, supervisor assignment with the VIRTUAL `active_key`, append-only evaluations, completion), certificates (`integrations/pdf.js`, `certificates` queue, idempotent `generateCertificate()`, 10-minute sweep). Client: `/accept-invite/:token`, `features/internships` (one `InternshipPage` for student/company/supervisor via `viewerRole`, `StaffPage`), routes `/my-internships`, `/company/interns`, `/company/staff`, `/supervisor`.
 - Phase 7 (admin, US-12) slice 1 is done: `modules/admin` (`getStats()` cached 60 s, user search, suspend/reinstate/delete with a required reason, audit-log viewer), company suspend/reinstate in `companies/service.js`; client admin portal at `/admin`, `/admin/companies`, `/admin/users`, `/admin/audit`. Next: hardening and deployment (slice 2).
 
+## Production checklist
+
+Things that differ from local dev and must be done before going live (the deployment guide will expand this):
+- **Google sign-in:** in Google Cloud Console, replace the localhost entries on the OAuth client. Authorized JavaScript origin: the public URL (e.g. `https://<domain>`); authorized redirect URI: `https://<domain>/api/v1/auth/google/callback` (it must equal `APP_URL` + `/api/v1/auth/google/callback`, or `GOOGLE_CALLBACK_URL` if set). Move the consent screen from Testing to In production so any Google account can sign in, not only test users.
+- **URLs and cookies:** set `APP_URL` and `CORS_ORIGIN` to the public HTTPS URL; leave `COOKIE_SECURE` at its production default (true).
+- **Email:** set `SMTP_*` and `MAIL_FROM`; without `SMTP_HOST` emails are only logged.
+- **Secrets:** a new `JWT_ACCESS_SECRET`; production R2 keys (or SeaweedFS) and buckets; production database credentials.
+
 ## Commands
 
 Run from the repo root. Copy `.env.example` to `.env` first. There is one `.env` at the root, used by the API locally and by compose.
