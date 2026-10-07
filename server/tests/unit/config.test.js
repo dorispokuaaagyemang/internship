@@ -38,10 +38,6 @@ describe('loadConfig', () => {
     expect(config.auth).toMatchObject({ accessTtl: '15m', refreshTtlDays: 7, bcryptCost: 12, cookieSecure: false });
   });
 
-  it('defaults to secure cookies in production', () => {
-    expect(loadConfig({ ...validEnv, NODE_ENV: 'production' }).auth.cookieSecure).toBe(true);
-  });
-
   it('defaults APP_URL to CORS_ORIGIN and logs email when SMTP_HOST is empty', () => {
     const config = loadConfig({ ...validEnv, SMTP_HOST: '' });
     expect(config.appUrl).toBe('http://localhost:5173');
@@ -66,5 +62,41 @@ describe('loadConfig', () => {
 
   it('rejects a short JWT secret', () => {
     expect(() => loadConfig({ ...validEnv, JWT_ACCESS_SECRET: 'short' })).toThrow(/JWT_ACCESS_SECRET/);
+  });
+});
+
+describe('production safety checks', () => {
+  const production = {
+    ...validEnv,
+    NODE_ENV: 'production',
+    CORS_ORIGIN: 'https://internships.example.com',
+    APP_URL: 'https://internships.example.com',
+    JWT_ACCESS_SECRET: 'kq3V9x0bW7nYt2LmP5cR8sD1fG4hJ6aZ',
+    SMTP_HOST: 'smtp.example.com',
+  };
+
+  it('accepts a complete production configuration', () => {
+    expect(loadConfig(production).auth.cookieSecure).toBe(true);
+  });
+
+  it('lists every unsafe setting at once', () => {
+    const run = () =>
+      loadConfig({ ...production, JWT_ACCESS_SECRET: 'change-me-to-a-random-string-of-at-least-32-chars', APP_URL: 'http://localhost:5173', SMTP_HOST: '', COOKIE_SECURE: 'false' });
+    expect(run).toThrow(/JWT_ACCESS_SECRET is a placeholder/);
+    expect(run).toThrow(/APP_URL must be the public https:\/\/ URL/);
+    expect(run).toThrow(/SMTP_HOST is required/);
+    expect(run).toThrow(/COOKIE_SECURE must not be false/);
+  });
+
+  it('does not apply them in development', () => {
+    expect(() => loadConfig({ ...validEnv, JWT_ACCESS_SECRET: 'change-me-to-a-random-string-of-at-least-32-chars' })).not.toThrow();
+  });
+});
+
+describe('ALLOW_INSECURE_PRODUCTION', () => {
+  it('lets the full Docker stack run locally over http, and only when set', () => {
+    const local = { ...validEnv, NODE_ENV: 'production', COOKIE_SECURE: 'false' };
+    expect(() => loadConfig(local)).toThrow(/must be the public https/);
+    expect(() => loadConfig({ ...local, ALLOW_INSECURE_PRODUCTION: 'true' })).not.toThrow();
   });
 });

@@ -1,0 +1,25 @@
+# Production on the VPS, layered on docker-compose.yml (see docs/DEPLOYMENT.md):
+#   docker compose --env-file .env -f docker/docker-compose.yml -f docker/docker-compose.prod.yml up -d --build
+# Adds HTTPS (Let's Encrypt), HSTS and the certificate volumes. Certificates are renewed by a
+# host cron job (certbot in a throwaway container), followed by an nginx reload.
+services:
+  nginx:
+    ports:
+      - "80:80"
+      - "443:443"
+    environment:
+      DOMAIN: ${DOMAIN:?Set DOMAIN in .env, e.g. internships.example.com}
+    volumes:
+      # The image turns this template into conf.d/default.conf, filling in ${DOMAIN}.
+      - ./nginx/https.conf.template:/etc/nginx/templates/default.conf.template:ro
+      - ./nginx/hsts.conf:/etc/nginx/snippets/hsts.conf:ro
+      - ./certbot/conf:/etc/letsencrypt:ro
+      - ./certbot/www:/var/www/certbot:ro
+
+  # Run on demand only (profile): docker compose ... run --rm certbot <command>
+  certbot:
+    image: certbot/certbot:v3.0.1
+    profiles: ["tools"]
+    volumes:
+      - ./certbot/conf:/etc/letsencrypt
+      - ./certbot/www:/var/www/certbot

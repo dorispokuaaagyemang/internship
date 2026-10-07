@@ -134,7 +134,7 @@ describe('staff invites (US-09)', () => {
 
     expect(res.status).toBe(201);
     expect(res.body.member).toMatchObject({ id: 50, email: 'grace@acme.co.ke', fullName: 'Grace Hopper', status: 'invited', activeInterns: 0 });
-    expect(User.create).toHaveBeenCalledWith({ email: 'grace@acme.co.ke', role: 'supervisor', status: 'pending' }, expect.anything());
+    expect(User.create).toHaveBeenCalledWith({ email: 'grace@acme.co.ke', displayName: 'Grace Hopper', role: 'supervisor', status: 'pending' }, expect.anything());
     expect(CompanyMember.create).toHaveBeenCalledWith({ companyId: 5, userId: 50, memberRole: 'supervisor', fullName: 'Grace Hopper' }, expect.anything());
 
     const [template, to, data] = enqueueEmail.mock.calls[0];

@@ -146,3 +146,13 @@ on('company.reinstated', async ({ company }) => {
   const reps = await companyReps(company.id);
   await notify(reps.map((r) => r.id), 'company.reinstated', { companyId: company.id, companyName: company.name, status: company.status });
 });
+
+// US-11: the supervisor is reminded once the end date has passed (maintenance job).
+on('internship.ended', async ({ internshipId, supervisorId, endDate, postingTitle, studentName }) => {
+  const supervisor = await User.findByPk(supervisorId, { attributes: ['id', 'email'] });
+  const url = `${config.appUrl}/supervisor/interns/${internshipId}`;
+  await Promise.all([
+    notify([supervisorId], 'internship.ended', { internshipId, endDate, postingTitle, studentName }),
+    supervisor && email('internshipEnded', supervisor.email, { studentName, postingTitle, endDate, url }),
+  ]);
+});

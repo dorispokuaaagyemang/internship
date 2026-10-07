@@ -26,6 +26,12 @@ export const phone = Joi.string()
 const email = Joi.string().trim().lowercase().email().max(255).required();
 
 export const registerSchema = Joi.object({
+  // US-01: the student's (or representative's) name.
+  fullName: Joi.string().trim().min(2).max(120).required().messages({
+    'any.required': 'Full name is required',
+    'string.empty': 'Full name is required',
+    'string.min': 'Full name is required',
+  }),
   email,
   password,
   phone: phone.required(),

@@ -48,3 +48,15 @@ export const authLimiter = rateLimit({
   store: config.env === 'test' ? undefined : new RedisCounterStore('rl:auth:'),
   handler: (req, res, next) => next(new AppError(429, 'TOO_MANY_REQUESTS', 'Too many attempts, try again later')),
 });
+
+// A general per-IP ceiling for the whole API, well above normal use, against floods and
+// scraping. The stricter authLimiter still applies to the auth endpoints.
+export const apiLimiter = rateLimit({
+  windowMs: 5 * 60 * 1000,
+  limit: config.apiRateLimit,
+  standardHeaders: 'draft-8',
+  legacyHeaders: false,
+  passOnStoreError: true,
+  store: config.env === 'test' ? undefined : new RedisCounterStore('rl:api:'),
+  handler: (req, res, next) => next(new AppError(429, 'TOO_MANY_REQUESTS', 'Too many requests, slow down and try again shortly')),
+});

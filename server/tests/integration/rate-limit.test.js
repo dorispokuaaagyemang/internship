@@ -22,3 +22,16 @@ describe('auth rate limit (ARCHITECTURE.md §4.2)', () => {
     expect(res.body.error.code).toBe('TOO_MANY_REQUESTS');
   });
 });
+
+describe('general API rate limit', () => {
+  it('sends the standard RateLimit headers on API routes but not on the health check', async () => {
+    const app = createApp();
+
+    const api = await request(app).get('/api/v1/postings/abc');
+    expect(api.headers.ratelimit).toMatch(/"10000-in-5min"/);
+
+    // The health check answers (up or down) without counting towards the limit.
+    const health = await request(app).get('/api/v1/health');
+    expect(health.headers.ratelimit).toBeUndefined();
+  });
+});

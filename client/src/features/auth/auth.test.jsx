@@ -73,13 +73,14 @@ describe('RegisterPage (US-01, US-04)', () => {
     renderApp(<RegisterPage />, { route: '/register', path: '/register', auth });
 
     await userEvent.click(screen.getByLabelText(/Registering a company/));
+    await userEvent.type(screen.getByLabelText('Full name'), 'Grace Hopper');
     await userEvent.type(screen.getByLabelText('Email'), 'rep@acme.co.ke');
     await userEvent.type(screen.getByLabelText('Password'), 'secret#123');
     await userEvent.type(screen.getByLabelText('Company contact phone'), '+254 712 345 678');
     await userEvent.click(screen.getByRole('button', { name: 'Create account' }));
 
     await waitFor(() =>
-      expect(auth.register).toHaveBeenCalledWith({ role: 'company_rep', email: 'rep@acme.co.ke', password: 'secret#123', phone: '+254712345678' }),
+      expect(auth.register).toHaveBeenCalledWith({ fullName: 'Grace Hopper', role: 'company_rep', email: 'rep@acme.co.ke', password: 'secret#123', phone: '+254712345678' }),
     );
     expect(await screen.findAllByText('An account with this email already exists')).not.toHaveLength(0);
   });

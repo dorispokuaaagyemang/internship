@@ -40,6 +40,10 @@ const schema = Joi.object({
   BCRYPT_COST: Joi.number().integer().min(4).max(15).default(12),
   // Requests per IP per 15 minutes on the auth endpoints.
   AUTH_RATE_LIMIT: Joi.number().integer().min(1).default(20),
+  // Requests per IP per 5 minutes across the whole API.
+  API_RATE_LIMIT: Joi.number().integer().min(1).default(600),
+  // Skips the production safety checks (see productionProblems). Never set it on a real server.
+  ALLOW_INSECURE_PRODUCTION: Joi.boolean().default(false),
   // Secure cookies need https; the compose stack serves plain http on :80, so set false there.
   COOKIE_SECURE: Joi.boolean().when('NODE_ENV', {
     is: 'production',
@@ -67,11 +71,31 @@ const schema = Joi.object({
 }).unknown(true);
 
 // Fails fast at startup with every missing/invalid variable listed.
+// Settings that are fine for local development but unsafe or broken in production. Checked only
+// when NODE_ENV=production, and reported together with the schema errors.
+function productionProblems(value) {
+  const problems = [];
+  if (/change-me|^(.)\1+$/i.test(value.JWT_ACCESS_SECRET)) {
+    problems.push('JWT_ACCESS_SECRET is a placeholder; generate a random one');
+  }
+  for (const key of ['CORS_ORIGIN', 'APP_URL']) {
+    const url = value[key] ?? value.CORS_ORIGIN;
+    if (!/^https:\/\//.test(url) || /localhost|127\.0\.0\.1/.test(url)) problems.push(`${key} must be the public https:// URL`);
+  }
+  // Without SMTP, verification emails are only logged, so no one could activate an account.
+  if (!value.SMTP_HOST) problems.push('SMTP_HOST is required (accounts are activated by email)');
+  if (value.COOKIE_SECURE === false) problems.push('COOKIE_SECURE must not be false behind https');
+  if (/change-me/i.test(value.DB_PASSWORD ?? '')) problems.push('DB_PASSWORD is a placeholder');
+  return problems;
+}
+
 export function loadConfig(env = process.env) {
   const { value, error } = schema.validate(env, { abortEarly: false, convert: true });
-  if (error) {
-    const problems = error.details.map((d) => `  - ${d.message}`).join('\n');
-    throw new Error(`Invalid environment configuration:\n${problems}`);
+  const problems = (error?.details ?? []).map((d) => d.message);
+  // ALLOW_INSECURE_PRODUCTION: only for the full Docker stack on a developer machine over http.
+  if (!error && value.NODE_ENV === 'production' && !value.ALLOW_INSECURE_PRODUCTION) problems.push(...productionProblems(value));
+  if (problems.length) {
+    throw new Error(`Invalid environment configuration:\n${problems.map((p) => `  - ${p}`).join('\n')}`);
   }
 
   return {
@@ -79,6 +103,7 @@ export function loadConfig(env = process.env) {
     port: value.PORT,
     logLevel: value.LOG_LEVEL,
     corsOrigin: value.CORS_ORIGIN,
+    apiRateLimit: value.API_RATE_LIMIT,
     db: {
       host: value.DB_HOST,
       port: value.DB_PORT,

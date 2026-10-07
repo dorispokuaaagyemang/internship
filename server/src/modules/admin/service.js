@@ -68,7 +68,7 @@ function serializeUser(u) {
     email: u.email,
     role: u.role,
     status: u.status,
-    name: u.studentProfile?.fullName ?? u.membership?.fullName ?? null,
+    name: u.studentProfile?.fullName ?? u.membership?.fullName ?? u.displayName ?? null,
     company: u.membership?.company ? { id: u.membership.company.id, name: u.membership.company.name } : null,
     emailVerified: Boolean(u.emailVerifiedAt),
     signInMethod: u.googleId ? 'google' : 'password',
@@ -82,6 +82,7 @@ export async function listUsers({ q, role, status, page, limit }) {
   if (q) {
     where[Op.or] = [
       { email: { [Op.like]: like(q) } },
+      { displayName: { [Op.like]: like(q) } },
       { '$studentProfile.full_name$': { [Op.like]: like(q) } },
       { '$membership.full_name$': { [Op.like]: like(q) } },
     ];

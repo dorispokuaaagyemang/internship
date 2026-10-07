@@ -94,3 +94,44 @@ This file maps every user story and non-functional requirement in [ACCEPTANCE.md
 | Auditability: admin + auth events | `audit_logs` written for register, login, failed login, logout, refresh-token reuse, email verification, Google sign-in, admin actions |
 | ~~Reliability: SMS monitoring + email fallback~~ | Dropped with US-00B |
 | Compliance: data protection | Minimal scopes, soft delete + anonymization, encrypted backups |
+
+## Coverage review (2026-10-07)
+
+Every acceptance criterion checked against the implementation, with automated tests (server 276,
+client 76) and checks against the real database (Aiven MySQL), storage (Cloudflare R2) and Google.
+
+| Story | Status | Notes |
+|---|---|---|
+| US-00A Google sign-in | Met | Verified live: new account active at once, Google name kept, existing email linked, denial handled |
+| US-00B SMS verification | Dropped (2026-10-06) | No SMS gateway available. Phone numbers are still format-checked (E.164) at registration and for the company contact |
+| US-01 Student registration | Met, one deviation | Name, email, password (rules enforced), duplicate email refused, email verification required. **University and department are collected on the profile**, not the registration form; applying is blocked until they are filled in |
+| US-02 Profile | Met | PDF/DOCX < 5 MB checked by content; mandatory fields highlighted; `updated_at` on every change |
+| US-03 Search and apply | Met | Search ~0.2–0.4 s against Aiven (limit 2 s); completeness gate; Applied + confirmation; duplicates refused by a UNIQUE index |
+| US-04 Company verification | Met | Pending Verification → admin approval → Verified; unverified companies can't post |
+| US-05 Postings | Met | Draft → Active → auto-closed at the deadline (5-minute job, and checked on apply and search) |
+| US-06 Review applications | Met | Profile summaries; status changes notify the student; filters on skills (all), university, GPA |
+| US-07 Status tracking | Met | Live over Socket.IO, in-app + email notifications; closed status set enforced by the transition table |
+| US-08 Withdraw | Met | Only from Applied/Shortlisted; company notified; button absent otherwise |
+| US-09 Supervisor | Met | Staff invited by email; one active supervisor per intern enforced by a UNIQUE generated column; both notified |
+| US-10 Evaluations | Met | Rating 1–5 (CHECK constraint), comments, attendance; timestamped; append-only; read-only for students |
+| US-11 Certificate | Met | Blocked with a message until the end date passed and a final evaluation exists; PDF generated, stored (R2), emailed link; verified live |
+| US-12 Admin | Met | Counts; suspension takes effect on the next request (verified: 200 → 403); all admin actions audited with reason |
+
+**Non-functional requirements**
+
+| Requirement | Status | Notes |
+|---|---|---|
+| RBAC | Met | `authorize()` per route plus ownership checks in services (404 for others' records) |
+| Encrypted storage | Met for files; database depends on hosting | Files encrypted at rest (R2 always; SeaweedFS `-s3.encryptVolumeData`). Aiven encrypts the database at rest; a self-hosted MySQL on the VPS needs disk encryption (DEPLOYMENT.md) |
+| OAuth 2.0 | Met | Authorization-code flow with signed state and nonce |
+| Rate limiting | Met | Auth endpoints 20 / 15 min per IP; whole API 600 / 5 min per IP (Redis-backed) |
+| Performance 2–3 s | Met in measurements | Search ~0.4 s, lists well under 1 s against a remote database; no load test has been run |
+| Auditability | Met | Admin actions and auth events in an insert-only audit log, viewable by admins |
+| Reliability (SMS) | Dropped | With US-00B |
+| Compliance (GDPR/local) | **Partly met** | Data minimised (Google scope `openid email profile`), access controlled, audited. **Missing:** self-service account deletion and data export, and a written retention policy. Admin deletion is a soft delete (data kept for the audit trail) |
+
+**Open items**
+- GDPR/local data-protection: decide on account deletion (anonymise vs. keep), data export, and a retention policy.
+- The production nginx/HTTPS configuration and `backup.sh` have not been run yet (no Docker on the development machine); do the checklist in DEPLOYMENT.md on a staging server first.
+- Implementation notes ask for use-case diagrams per story; the architecture has context, container, sequence and state diagrams, but no per-story use-case diagrams.
+- No load test: run one before launch if many concurrent users are expected.

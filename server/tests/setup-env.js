@@ -16,6 +16,7 @@ Object.assign(process.env, {
   BCRYPT_COST: '4',
   // Room for every auth request in tests/integration/auth.test.js, which share one limiter.
   AUTH_RATE_LIMIT: '50',
+  API_RATE_LIMIT: '10000',
   GOOGLE_CLIENT_ID: 'test-client.apps.googleusercontent.com',
   GOOGLE_CLIENT_SECRET: 'test-google-secret',
 });

@@ -96,7 +96,7 @@ describe('admin user management (US-12)', () => {
     expect(res.body.items[0]).toMatchObject({ name: 'Ada Lovelace', role: 'student', signInMethod: 'password', emailVerified: true });
     const query = User.findAndCountAll.mock.calls[0][0];
     expect(query.where.role).toBe('student');
-    expect(query.where[Op.or]).toHaveLength(3);
+    expect(query.where[Op.or]).toHaveLength(4);
     expect(query.subQuery).toBe(false);
   });
 

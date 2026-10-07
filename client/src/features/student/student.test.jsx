@@ -57,6 +57,13 @@ describe('TagInput', () => {
 });
 
 describe('ProfilePage (US-02)', () => {
+  it('starts a new profile with the name given at registration or by Google', async () => {
+    api.get.mockResolvedValue({ data: { profile: null, completeness: { complete: false, missing: ['fullName', 'university', 'department'] } } });
+    renderApp(<ProfilePage />, { auth: makeAuth({ user: { id: 7, email: 'ada@x.co', role: 'student', status: 'active', displayName: 'Ada Lovelace' } }) });
+
+    expect(await screen.findByLabelText('Full name')).toHaveValue('Ada Lovelace');
+  });
+
   it('highlights every missing mandatory field and saves nothing', async () => {
     api.get.mockResolvedValue({ data: { profile: null, completeness: { complete: false, missing: ['fullName', 'university', 'department'] } } });
     renderApp(<ProfilePage />);

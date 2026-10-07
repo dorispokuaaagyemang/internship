@@ -83,6 +83,19 @@ export const templates = {
 <p><a href="${escapeHtml(url)}">Download your certificate</a></p>`,
   }),
 
+  // US-11: the internship has ended; the certificate needs a final evaluation and confirmation.
+  internshipEnded: ({ studentName, postingTitle, endDate, url }) => ({
+    subject: `Internship ended: ${studentName}`,
+    text: [
+      `${studentName}'s internship (${postingTitle}) ended on ${endDate}.`,
+      '',
+      'To issue their certificate, add a final evaluation and confirm completion:',
+      url,
+    ].join('\n'),
+    html: `<p>${escapeHtml(studentName)}'s internship (<strong>${escapeHtml(postingTitle)}</strong>) ended on ${escapeHtml(endDate)}.</p>
+<p>To issue their certificate, <a href="${escapeHtml(url)}">add a final evaluation and confirm completion</a>.</p>`,
+  }),
+
   // US-03: confirmation to the student.
   applicationReceived: ({ postingTitle, companyName, url }) => ({
     subject: `Application sent: ${postingTitle}`,

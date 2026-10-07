@@ -177,7 +177,7 @@ export async function addStaff(repId, { email, fullName }, { ip }) {
   let membership;
   try {
     ({ user, membership } = await sequelize.transaction(async (transaction) => {
-      const created = await User.create({ email, role: 'supervisor', status: 'pending' }, { transaction });
+      const created = await User.create({ email, displayName: fullName, role: 'supervisor', status: 'pending' }, { transaction });
       const member = await CompanyMember.create({ companyId: company.id, userId: created.id, memberRole: 'supervisor', fullName }, { transaction });
       await record({ actor: rep, action: 'company.staff_added', entity: { type: 'user', id: created.id }, ip, metadata: { companyId: company.id } }, { transaction });
       return { user: created, membership: member };

@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { loginSchema, registerSchema } from '../../src/modules/auth/validators.js';
 
-const valid = { email: 'Ada@Example.com', password: 'secret#123', phone: '+254 712 345678', role: 'student' };
+const valid = { fullName: ' Ada Lovelace ', email: 'Ada@Example.com', password: 'secret#123', phone: '+254 712 345678', role: 'student' };
 
 function errors(body) {
   const { error } = registerSchema.validate(body, { abortEarly: false });
@@ -33,6 +33,11 @@ describe('register validation', () => {
   it('rejects a phone without a country code or with a bad format', () => {
     expect(errors({ ...valid, phone: '0712345678' })[0]).toMatch(/country code/);
     expect(errors({ ...valid, phone: '+2541' })[0]).toMatch(/country code/);
+  });
+
+  it('US-01: requires the full name', () => {
+    expect(errors({ ...valid, fullName: ' ' })).toEqual(['Full name is required']);
+    expect(registerSchema.validate(valid).value.fullName).toBe('Ada Lovelace');
   });
 
   it('only students and company reps can self-register', () => {

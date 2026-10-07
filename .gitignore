@@ -6,3 +6,4 @@ coverage/
 .local/
 certs/
 .claude/settings.local.json
+docker/certbot/

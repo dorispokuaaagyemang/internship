@@ -76,14 +76,14 @@ async function sendVerificationEmail(user, url) {
 }
 
 // US-01: password accounts start pending; verifying the email activates them.
-export async function register({ email, password, phone, role }, { ip }) {
+export async function register({ fullName, email, password, phone, role }, { ip }) {
   const passwordHash = await bcrypt.hash(password, config.auth.bcryptCost);
   let session;
   let verifyUrl;
   try {
     session = await sequelize.transaction(async (transaction) => {
       const user = await User.create(
-        { email, passwordHash, role, phoneE164: phone, status: 'pending' },
+        { email, displayName: fullName, passwordHash, role, phoneE164: phone, status: 'pending' },
         { transaction },
       );
       await record({ actor: user, action: 'auth.register', entity: { type: 'user', id: user.id }, ip }, { transaction });
@@ -236,7 +236,11 @@ export function startGoogleSignIn(intent) {
 // Finds the account by Google id, then by email (linking it), and creates one only if neither exists.
 async function findOrCreateGoogleUser(profile, intent) {
   const byGoogleId = await User.findOne({ where: { googleId: profile.googleId } });
-  if (byGoogleId) return { user: byGoogleId, outcome: 'existing' };
+  if (byGoogleId) {
+    // Accounts made before names were kept get the Google name on their next sign-in.
+    if (!byGoogleId.displayName && profile.name) await byGoogleId.update({ displayName: profile.name });
+    return { user: byGoogleId, outcome: 'existing' };
+  }
 
   const byEmail = await User.findOne({ where: { email: profile.email } });
   if (byEmail) {
@@ -245,6 +249,7 @@ async function findOrCreateGoogleUser(profile, intent) {
 
     const now = new Date();
     byEmail.googleId = profile.googleId;
+    byEmail.displayName ??= profile.name;
     if (!byEmail.emailVerifiedAt) {
       // Whoever set this password never proved they own the address, so it goes,
       // along with its sessions. Otherwise an attacker could pre-register a victim's email.
@@ -262,6 +267,7 @@ async function findOrCreateGoogleUser(profile, intent) {
     const user = await User.create({
       email: profile.email,
       googleId: profile.googleId,
+      displayName: profile.name, // US-00A: the Google name
       role: intent,
       status: 'active', // Google has verified the email
       emailVerifiedAt: new Date(),
@@ -358,6 +364,10 @@ export async function acceptInvite(rawToken, { password }, { ip }) {
     const [used] = await AccountInvite.update({ usedAt: now }, { where: { id: invite.id, usedAt: null }, transaction });
     if (used === 0) throw inviteInvalid();
     await user.update({ passwordHash, emailVerifiedAt: user.emailVerifiedAt ?? now, status: 'active', lastLoginAt: now }, { transaction });
+    if (!user.displayName) {
+      const membership = await CompanyMember.findOne({ where: { userId: user.id }, attributes: ['fullName'], transaction });
+      if (membership?.fullName) await user.update({ displayName: membership.fullName }, { transaction });
+    }
     await record({ actor: user, action: 'auth.invite_accepted', entity: { type: 'user', id: user.id }, ip }, { transaction });
     return issueTokens(user, { transaction });
   });

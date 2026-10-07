@@ -18,6 +18,8 @@ export function initUser(sequelize) {
     {
       id: { type: DataTypes.INTEGER.UNSIGNED, autoIncrement: true, primaryKey: true },
       email: { type: DataTypes.STRING(255), allowNull: false, unique: true },
+      // US-00A, US-01: typed at registration or taken from Google.
+      displayName: { type: DataTypes.STRING(120), allowNull: true },
       passwordHash: { type: DataTypes.STRING(255), allowNull: true },
       googleId: { type: DataTypes.STRING(255), allowNull: true, unique: true },
       role: { type: DataTypes.ENUM(...ROLES), allowNull: false },

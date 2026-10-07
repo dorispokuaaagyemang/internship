@@ -107,6 +107,7 @@ describe('GET /api/v1/auth/google/callback (US-00A)', () => {
     expect(User.create).toHaveBeenCalledWith({
       email: 'ada@example.com',
       googleId: 'g-123',
+      displayName: 'Ada',
       role: 'company_rep',
       status: 'active',
       emailVerifiedAt: expect.any(Date),

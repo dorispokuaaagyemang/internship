@@ -1,0 +1,30 @@
+# Production: HTTPS with Let's Encrypt certificates. The nginx image fills in ${DOMAIN} when it
+# starts (envsubst over /etc/nginx/templates). See docs/DEPLOYMENT.md for the first certificate.
+
+# HTTP: only the ACME challenge (certificate renewal) and a redirect to HTTPS.
+server {
+    listen 80;
+    server_name ${DOMAIN};
+
+    location /.well-known/acme-challenge/ {
+        root /var/www/certbot;
+    }
+
+    location / {
+        return 301 https://$host$request_uri;
+    }
+}
+
+server {
+    listen 443 ssl;
+    http2 on;
+    server_name ${DOMAIN};
+
+    ssl_certificate /etc/letsencrypt/live/${DOMAIN}/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/${DOMAIN}/privkey.pem;
+    ssl_protocols TLSv1.2 TLSv1.3;
+    ssl_session_cache shared:SSL:10m;
+    ssl_session_timeout 1d;
+
+    include /etc/nginx/snippets/locations.conf;
+}

@@ -8,7 +8,7 @@ import { useAuth } from './auth-context';
 import { registerSchema } from './schemas';
 import { GoogleButton } from './GoogleButton';
 
-const FIELDS = ['role', 'email', 'password', 'phone'];
+const FIELDS = ['fullName', 'role', 'email', 'password', 'phone'];
 
 // US-01 (students) and US-04 (companies). The account starts pending; on success the session
 // changes and GuestOnly moves on to /verify until the email link is opened.
@@ -17,7 +17,7 @@ export function RegisterPage() {
   const [error, setError] = useState(null);
   const form = useForm({
     resolver: zodResolver(registerSchema),
-    defaultValues: { role: 'student', email: '', password: '', phone: '' },
+    defaultValues: { fullName: '', role: 'student', email: '', password: '', phone: '' },
   });
   const { register, handleSubmit, formState, control } = form;
   const role = useWatch({ control, name: 'role' });
@@ -48,6 +48,9 @@ export function RegisterPage() {
           {formState.errors.role && <p className="field__error">{formState.errors.role.message}</p>}
         </fieldset>
 
+        <Field label="Full name" error={formState.errors.fullName?.message}>
+          {(a11y) => <input autoComplete="name" {...a11y} {...register('fullName')} />}
+        </Field>
         <Field label="Email" error={formState.errors.email?.message}>
           {(a11y) => <input type="email" autoComplete="email" {...a11y} {...register('email')} />}
         </Field>

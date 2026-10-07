@@ -6,6 +6,7 @@ import { apiError } from '../../lib/api';
 import { applyServerErrors } from '../../lib/forms';
 import { date, fileSize } from '../../lib/format';
 import { Alert, Button, Card, Field, PageLoading } from '../../components/ui';
+import { useAuth } from '../auth/auth-context';
 import { TagInput } from '../../components/TagInput';
 import { openResume, useDeleteResume, useProfile, useSaveProfile, useUploadResume } from './api';
 
@@ -24,8 +25,9 @@ const profileSchema = z.object({
 });
 const FIELDS = ['fullName', 'university', 'department', 'gpa', 'bio', 'skills'];
 
-const toForm = (p) => ({
-  fullName: p?.fullName ?? '',
+// A new profile starts with the name given at registration (or by Google).
+const toForm = (p, displayName) => ({
+  fullName: p?.fullName ?? displayName ?? '',
   university: p?.university ?? '',
   department: p?.department ?? '',
   gpa: p?.gpa != null ? String(p.gpa) : '',
@@ -34,9 +36,10 @@ const toForm = (p) => ({
 });
 
 function ProfileForm({ profile }) {
+  const { user } = useAuth();
   const save = useSaveProfile();
   const [result, setResult] = useState(null);
-  const form = useForm({ resolver: zodResolver(profileSchema), defaultValues: toForm(profile) });
+  const form = useForm({ resolver: zodResolver(profileSchema), defaultValues: toForm(profile, user?.displayName) });
   const { register, handleSubmit, formState, control, reset } = form;
 
   const onSubmit = handleSubmit(async (values) => {

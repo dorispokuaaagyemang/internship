@@ -59,7 +59,7 @@ beforeEach(() => {
 });
 
 describe('POST /api/v1/auth/register (US-01)', () => {
-  const body = { email: 'Ada@Example.com', password: PASSWORD, phone: '+254712345678', role: 'student' };
+  const body = { fullName: 'Ada Lovelace', email: 'Ada@Example.com', password: PASSWORD, phone: '+254712345678', role: 'student' };
 
   it('creates a pending account, returns an access token and sets the refresh cookie', async () => {
     User.create.mockImplementation(async (values) => makeUser({ ...values, emailVerifiedAt: null }));
@@ -120,7 +120,7 @@ describe('POST /api/v1/auth/register (US-01)', () => {
 
     expect(res.status).toBe(422);
     expect(res.body.error.code).toBe('VALIDATION_ERROR');
-    expect(Object.keys(res.body.error.fields).sort()).toEqual(['email', 'password', 'phone', 'role']);
+    expect(Object.keys(res.body.error.fields).sort()).toEqual(['email', 'fullName', 'password', 'phone', 'role']);
     expect(User.create).not.toHaveBeenCalled();
   });
 });

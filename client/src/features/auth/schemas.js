@@ -25,6 +25,8 @@ export const loginSchema = z.object({
 });
 
 export const registerSchema = z.object({
+  // US-01
+  fullName: z.string().trim().min(2, 'Full name is required').max(120),
   role: z.enum(['student', 'company_rep'], { message: 'Choose an account type' }),
   email,
   password,
