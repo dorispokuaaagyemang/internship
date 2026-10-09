@@ -7,6 +7,8 @@ import { AuthProvider } from './features/auth/AuthProvider';
 import { AppRoutes } from './routes/AppRoutes';
 import './styles.css';
 
+
+
 createRoot(document.getElementById('root')).render(
   <StrictMode>
     <QueryClientProvider client={queryClient}>
