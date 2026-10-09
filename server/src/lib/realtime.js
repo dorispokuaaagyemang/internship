@@ -36,7 +36,10 @@ export function initRealtime(httpServer, { adapter = true } = {}) {
   });
 
   if (adapter) {
-    const pub = new Redis(config.redisUrl, { lazyConnect: false });
+    // maxRetriesPerRequest: null makes the adapter's commands wait for Redis to come back. With the
+    // default (20), the adapter's SUBSCRIBE is rejected while Redis is down, nothing catches it,
+    // and the unhandled rejection stops the API.
+    const pub = new Redis(config.redisUrl, { lazyConnect: false, maxRetriesPerRequest: null });
     const sub = pub.duplicate();
     for (const client of [pub, sub]) {
       client.on('error', (err) => logger.warn({ err: err.code || err.message }, 'Socket.IO Redis connection error'));
