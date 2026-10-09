@@ -32,11 +32,11 @@ services:
           type: keyvalue
           name: internship-redis
           property: connectionString
-      # The public Vercel URL, e.g. https://internship.vercel.app
+      # The public Vercel URL (no trailing slash)
       - key: APP_URL
-        sync: false
+        value: https://internship-self-ten.vercel.app
       - key: CORS_ORIGIN
-        sync: false
+        value: https://internship-self-ten.vercel.app
       # Aiven MySQL
       - key: DB_HOST
         sync: false

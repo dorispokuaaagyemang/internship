@@ -46,10 +46,9 @@ retention) wait until the next request wakes it. Use Starter for real users.
 
 1. Render dashboard → **New → Blueprint** → choose the repository. Render reads `render.yaml` and
    creates `internship-api` and `internship-redis` in Frankfurt.
-2. It asks for each `sync: false` variable:
+2. `APP_URL` and `CORS_ORIGIN` are set in `render.yaml` to the Vercel URL,
+   `https://internship-self-ten.vercel.app`. It asks for each `sync: false` variable:
    - `ORIGIN_SECRET`: the secret from step 1.
-   - `APP_URL` and `CORS_ORIGIN`: the Vercel URL, e.g. `https://internship.vercel.app`. If you
-     don't know it yet, enter a placeholder and change both after step 3.
    - `DB_*`: from the Aiven service. `DB_SSL_CA`: paste the whole content of `ca.pem`.
    - `S3_ENDPOINT`: `https://<account-id>.r2.cloudflarestorage.com`; `S3_ACCESS_KEY` and
      `S3_SECRET_KEY` from the R2 token.
@@ -70,8 +69,7 @@ retention) wait until the next request wakes it. Use Starter for real users.
    - `API_ORIGIN` = `https://internship-api.onrender.com` (no trailing slash)
    - `ORIGIN_SECRET` = the same secret as on Render
    - `VITE_SOCKET_URL` = `https://internship-api.onrender.com`
-4. Deploy. Then, on Render, set `APP_URL` and `CORS_ORIGIN` to the final Vercel URL if they were
-   placeholders (Render redeploys by itself).
+4. Deploy. The app is at `https://internship-self-ten.vercel.app`.
 
 `client/vercel.json` does the rest: `/api/*` goes to `API_ORIGIN` with the secret header, every
 other path gets `index.html` (so links like `/company/interns` work), and the security headers are
@@ -80,8 +78,8 @@ set on every page.
 ## 4. Google sign-in
 
 Google Cloud Console → APIs & Services → Credentials → the OAuth client:
-- Authorized JavaScript origin: `https://<app>.vercel.app`
-- Authorized redirect URI: `https://<app>.vercel.app/api/v1/auth/google/callback`
+- Authorized JavaScript origin: `https://internship-self-ten.vercel.app`
+- Authorized redirect URI: `https://internship-self-ten.vercel.app/api/v1/auth/google/callback`
 - OAuth consent screen: **Publish app** (from Testing to In production).
 
 ## 5. Check it works
