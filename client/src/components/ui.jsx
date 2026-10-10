@@ -1,4 +1,4 @@
-import { useId } from 'react';
+import { useId, useState } from 'react';
 
 // Small shared building blocks. Every field has a visible label and announces its error,
 // so the forms work with a keyboard and a screen reader (US-02: missing fields highlighted).
@@ -21,6 +21,26 @@ export function Field({ label, error, hint, children, id: givenId }) {
           {error}
         </p>
       )}
+    </div>
+  );
+}
+
+// A password input with a Show/Hide toggle, so people can check what they typed.
+// React 19 passes `ref` as a prop, so React Hook Form's register() works as on a plain input.
+export function PasswordInput(props) {
+  const [visible, setVisible] = useState(false);
+  return (
+    <div className="password-input">
+      <input {...props} type={visible ? 'text' : 'password'} />
+      <button
+        type="button"
+        className="password-input__toggle"
+        onClick={() => setVisible((v) => !v)}
+        aria-pressed={visible}
+        aria-label={visible ? 'Hide password' : 'Show password'}
+      >
+        {visible ? 'Hide' : 'Show'}
+      </button>
     </div>
   );
 }

@@ -3,7 +3,14 @@ import { authenticate } from '../../middleware/auth.js';
 import { authLimiter } from '../../middleware/rate-limit.js';
 import { validate } from '../../middleware/validate.js';
 import * as controller from './controller.js';
-import { acceptInviteSchema, loginSchema, registerSchema, resendVerificationSchema } from './validators.js';
+import {
+  acceptInviteSchema,
+  forgotPasswordSchema,
+  loginSchema,
+  registerSchema,
+  resendVerificationSchema,
+  resetPasswordSchema,
+} from './validators.js';
 
 const router = Router();
 
@@ -16,6 +23,8 @@ router.get('/google', authLimiter, controller.googleStart);
 router.get('/google/callback', authLimiter, controller.googleCallback);
 router.get('/verify-email/:token', controller.verifyEmail);
 router.post('/verify-email/resend', authLimiter, validate(resendVerificationSchema), controller.resendVerification);
+router.post('/password/forgot', authLimiter, validate(forgotPasswordSchema), controller.forgotPassword);
+router.post('/password/reset', authLimiter, validate(resetPasswordSchema), controller.resetPassword);
 
 // US-09: staff invites (supervisors added by their company).
 router.get('/invite/:token', authLimiter, controller.getInvite);

@@ -4,6 +4,7 @@ import { emit } from '../../lib/events.js';
 import {
   RefreshToken,
   EmailVerificationToken,
+  PasswordResetToken,
   AccountInvite,
   Notification,
   Internship,
@@ -22,13 +23,14 @@ const READ_NOTIFICATION_RETENTION_DAYS = 180;
 // used, and old notifications that have been read. The audit log is never touched.
 export async function purgeExpired(now = new Date()) {
   const cutoff = new Date(now.getTime() - TOKEN_RETENTION_DAYS * DAY_MS);
-  const [refreshTokens, emailTokens, invites, notifications] = await Promise.all([
+  const [refreshTokens, emailTokens, resetTokens, invites, notifications] = await Promise.all([
     RefreshToken.destroy({ where: { [Op.or]: [{ expiresAt: { [Op.lt]: cutoff } }, { revokedAt: { [Op.lt]: cutoff } }] } }),
     EmailVerificationToken.destroy({ where: { [Op.or]: [{ expiresAt: { [Op.lt]: cutoff } }, { usedAt: { [Op.lt]: cutoff } }] } }),
+    PasswordResetToken.destroy({ where: { [Op.or]: [{ expiresAt: { [Op.lt]: cutoff } }, { usedAt: { [Op.lt]: cutoff } }] } }),
     AccountInvite.destroy({ where: { [Op.or]: [{ expiresAt: { [Op.lt]: cutoff } }, { usedAt: { [Op.lt]: cutoff } }] } }),
     Notification.destroy({ where: { readAt: { [Op.lt]: new Date(now.getTime() - READ_NOTIFICATION_RETENTION_DAYS * DAY_MS) } } }),
   ]);
-  return { refreshTokens, emailTokens, invites, notifications };
+  return { refreshTokens, emailTokens, resetTokens, invites, notifications };
 }
 
 // The `internships.markEnded` job (US-11): once an internship's end date has passed, its

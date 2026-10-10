@@ -3,7 +3,12 @@
 import { sequelize } from '../index.js';
 import { initUser, User } from './user.js';
 import { initRefreshToken, RefreshToken } from './refresh-token.js';
-import { initEmailVerificationToken, EmailVerificationToken } from './email-verification-token.js';
+import {
+  initEmailVerificationToken,
+  initPasswordResetToken,
+  EmailVerificationToken,
+  PasswordResetToken,
+} from './email-verification-token.js';
 import { initAuditLog, AuditLog } from './audit-log.js';
 import { initStudentProfile, StudentProfile } from './student-profile.js';
 import { initSkill, Skill } from './skill.js';
@@ -33,6 +38,7 @@ import {
 initUser(sequelize);
 initRefreshToken(sequelize);
 initEmailVerificationToken(sequelize);
+initPasswordResetToken(sequelize);
 initAuditLog(sequelize);
 initStudentProfile(sequelize);
 initSkill(sequelize);
@@ -54,6 +60,8 @@ RefreshToken.belongsTo(User, { foreignKey: 'userId', as: 'user' });
 
 User.hasMany(EmailVerificationToken, { foreignKey: 'userId', as: 'emailVerificationTokens' });
 EmailVerificationToken.belongsTo(User, { foreignKey: 'userId', as: 'user' });
+User.hasMany(PasswordResetToken, { foreignKey: 'userId', as: 'passwordResetTokens' });
+PasswordResetToken.belongsTo(User, { foreignKey: 'userId', as: 'user' });
 
 
 User.hasMany(AuditLog, { foreignKey: 'actorId', as: 'auditLogs' });
@@ -112,6 +120,7 @@ export {
   User,
   RefreshToken,
   EmailVerificationToken,
+  PasswordResetToken,
   AuditLog,
   StudentProfile,
   Skill,

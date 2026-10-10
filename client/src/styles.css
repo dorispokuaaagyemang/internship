@@ -292,6 +292,34 @@ textarea {
   width: 100%;
 }
 
+.password-input {
+  position: relative;
+}
+
+.password-input input {
+  padding-right: 4.5rem;
+}
+
+.password-input__toggle {
+  position: absolute;
+  top: 50%;
+  right: 0.4rem;
+  transform: translateY(-50%);
+  font: inherit;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--muted);
+  background: none;
+  border: 0;
+  padding: 0.25rem 0.5rem;
+  cursor: pointer;
+}
+
+.password-input__toggle:hover,
+.password-input__toggle:focus-visible {
+  color: var(--text);
+}
+
 textarea {
   min-height: 7rem;
   resize: vertical;

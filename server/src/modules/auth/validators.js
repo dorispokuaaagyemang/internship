@@ -44,6 +44,10 @@ export const resendVerificationSchema = Joi.object({ email });
 // US-09: an invited supervisor sets their password; the same rules as registration (US-01).
 export const acceptInviteSchema = Joi.object({ token: Joi.string().max(200).required(), password });
 
+// US-01: forgot password. The new password follows the registration rules.
+export const forgotPasswordSchema = Joi.object({ email });
+export const resetPasswordSchema = Joi.object({ token: Joi.string().max(200).required(), password });
+
 export const loginSchema = Joi.object({
   email,
   password: Joi.string().max(128).required(),

@@ -9,6 +9,7 @@ import {
   User,
   RefreshToken,
   EmailVerificationToken,
+  PasswordResetToken,
   AccountInvite,
   Company,
   CompanyMember,
@@ -329,6 +330,68 @@ export async function getCurrentUser(id) {
   const user = await User.findByPk(id);
   if (!user) throw new AppError(401, 'UNAUTHENTICATED', 'Account no longer exists');
   return user;
+}
+
+// --- Forgot password (US-01) ---
+// The emailed link lands on the app's /reset-password/:token page, which sets a new password.
+// Opening the link proves the address, so it also verifies the email (and so activates a pending
+// account), and a Google-only account can use it to add a password.
+
+const RESET_TTL_MS = HOUR_MS;
+const resetInvalid = () => new AppError(400, 'RESET_LINK_INVALID', 'This reset link is not valid. Request a new one.');
+
+// Always succeeds from the caller's view, so it can't be used to find out which emails have
+// accounts. At most one link per minute per account; suspended accounts get none.
+export async function requestPasswordReset({ email }, { ip }) {
+  const user = await User.findOne({ where: { email } });
+  if (!user || user.status === 'suspended') return;
+
+  const recent = await PasswordResetToken.findOne({
+    where: { userId: user.id, createdAt: { [Op.gt]: new Date(Date.now() - RESEND_COOLDOWN_MS) } },
+  });
+  if (recent) return;
+
+  const token = generateOpaqueToken();
+  await PasswordResetToken.create({ userId: user.id, tokenHash: hashToken(token), expiresAt: new Date(Date.now() + RESET_TTL_MS) });
+  await record({ actor: user, action: 'auth.password_reset_requested', entity: { type: 'user', id: user.id }, ip });
+
+  const url = `${config.appUrl}/reset-password/${token}`;
+  try {
+    await enqueueEmail('passwordReset', user.email, { url, expiresInMinutes: RESET_TTL_MS / 60000 });
+  } catch (err) {
+    const devLink = config.env === 'production' ? {} : { url };
+    logger.warn({ err: err.message, userId: user.id, ...devLink }, 'Could not queue the password reset email');
+  }
+}
+
+export async function resetPassword(rawToken, { password }, { ip }) {
+  const stored = await PasswordResetToken.findOne({ where: { tokenHash: hashToken(rawToken ?? '') } });
+  if (!stored || stored.usedAt) throw resetInvalid();
+  if (stored.expiresAt <= new Date()) {
+    throw new AppError(410, 'RESET_LINK_EXPIRED', 'This reset link has expired. Request a new one.');
+  }
+  const user = await User.findByPk(stored.userId);
+  if (!user) throw resetInvalid();
+  if (user.status === 'suspended') throw suspended();
+
+  const passwordHash = await bcrypt.hash(password, config.auth.bcryptCost);
+  const now = new Date();
+  await sequelize.transaction(async (transaction) => {
+    // Conditional update: the same link used twice at once works only once. Every other open
+    // link for this account stops working too.
+    const [used] = await PasswordResetToken.update({ usedAt: now }, { where: { id: stored.id, usedAt: null }, transaction });
+    if (used === 0) throw resetInvalid();
+    await PasswordResetToken.update({ usedAt: now }, { where: { userId: user.id, usedAt: null }, transaction });
+
+    user.passwordHash = passwordHash;
+    user.emailVerifiedAt ??= now;
+    if (readyToActivate(user)) user.status = 'active';
+    await user.save({ transaction });
+    // Whoever knew the old password is signed out everywhere.
+    await RefreshToken.update({ revokedAt: now }, { where: { userId: user.id, revokedAt: null }, transaction });
+    await record({ actor: user, action: 'auth.password_reset', entity: { type: 'user', id: user.id }, ip }, { transaction });
+  });
+  await invalidateUserStatus(user.id);
 }
 
 // --- Staff invites (US-09) ---

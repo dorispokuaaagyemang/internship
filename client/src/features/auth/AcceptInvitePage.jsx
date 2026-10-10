@@ -6,7 +6,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { api, apiError, setSession } from '../../lib/api';
 import { applyServerErrors } from '../../lib/forms';
-import { Alert, Button, Field, PageLoading } from '../../components/ui';
+import { Alert, Button, Field, PageLoading, PasswordInput } from '../../components/ui';
 import { homeFor, useAuth } from './auth-context';
 import { password } from './schemas';
 
@@ -64,10 +64,10 @@ export function AcceptInvitePage() {
       <Alert>{error}</Alert>
       <form onSubmit={onSubmit} noValidate className="stack">
         <Field label="Password" error={formState.errors.password?.message} hint="At least 8 characters, with a number and a special character.">
-          {(a11y) => <input type="password" autoComplete="new-password" {...a11y} {...register('password')} />}
+          {(a11y) => <PasswordInput autoComplete="new-password" {...a11y} {...register('password')} />}
         </Field>
         <Field label="Confirm password" error={formState.errors.confirm?.message}>
-          {(a11y) => <input type="password" autoComplete="new-password" {...a11y} {...register('confirm')} />}
+          {(a11y) => <PasswordInput autoComplete="new-password" {...a11y} {...register('confirm')} />}
         </Field>
         <Button type="submit" busy={formState.isSubmitting}>
           Set password and continue

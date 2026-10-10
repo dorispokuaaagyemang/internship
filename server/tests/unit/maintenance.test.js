@@ -1,6 +1,6 @@
 import { Op } from 'sequelize';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { RefreshToken, EmailVerificationToken, AccountInvite, Notification, Internship } from '../../src/db/models/index.js';
+import { RefreshToken, EmailVerificationToken, PasswordResetToken, AccountInvite, Notification, Internship } from '../../src/db/models/index.js';
 import { emit } from '../../src/lib/events.js';
 import { purgeExpired, remindEndedInternships } from '../../src/modules/maintenance/service.js';
 import { processMaintenance, SCHEDULES } from '../../src/jobs/processors/maintenance.js';
@@ -8,6 +8,7 @@ import { processMaintenance, SCHEDULES } from '../../src/jobs/processors/mainten
 vi.mock('../../src/db/models/index.js', () => ({
   RefreshToken: { destroy: vi.fn() },
   EmailVerificationToken: { destroy: vi.fn() },
+  PasswordResetToken: { destroy: vi.fn() },
   AccountInvite: { destroy: vi.fn() },
   Notification: { destroy: vi.fn(), count: vi.fn() },
   Internship: { findAll: vi.fn() },
@@ -25,16 +26,17 @@ const DAY = 86_400_000;
 
 beforeEach(() => {
   vi.clearAllMocks();
-  for (const m of [RefreshToken, EmailVerificationToken, AccountInvite, Notification]) m.destroy.mockResolvedValue(2);
+  for (const m of [RefreshToken, EmailVerificationToken, PasswordResetToken, AccountInvite, Notification]) m.destroy.mockResolvedValue(2);
 });
 
 describe('maintenance.cleanup', () => {
   it('removes credentials that stopped working over 30 days ago, and read notifications over 180 days old', async () => {
-    await expect(purgeExpired(NOW)).resolves.toEqual({ refreshTokens: 2, emailTokens: 2, invites: 2, notifications: 2 });
+    await expect(purgeExpired(NOW)).resolves.toEqual({ refreshTokens: 2, emailTokens: 2, resetTokens: 2, invites: 2, notifications: 2 });
 
     const cutoff = new Date(NOW.getTime() - 30 * DAY);
     expect(RefreshToken.destroy).toHaveBeenCalledWith({ where: { [Op.or]: [{ expiresAt: { [Op.lt]: cutoff } }, { revokedAt: { [Op.lt]: cutoff } }] } });
     expect(EmailVerificationToken.destroy).toHaveBeenCalledWith({ where: { [Op.or]: [{ expiresAt: { [Op.lt]: cutoff } }, { usedAt: { [Op.lt]: cutoff } }] } });
+    expect(PasswordResetToken.destroy).toHaveBeenCalledWith({ where: { [Op.or]: [{ expiresAt: { [Op.lt]: cutoff } }, { usedAt: { [Op.lt]: cutoff } }] } });
     expect(AccountInvite.destroy).toHaveBeenCalledWith({ where: { [Op.or]: [{ expiresAt: { [Op.lt]: cutoff } }, { usedAt: { [Op.lt]: cutoff } }] } });
     expect(Notification.destroy).toHaveBeenCalledWith({ where: { readAt: { [Op.lt]: new Date(NOW.getTime() - 180 * DAY) } } });
   });

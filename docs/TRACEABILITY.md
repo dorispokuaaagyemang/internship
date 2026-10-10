@@ -21,7 +21,8 @@ This file maps every user story and non-functional requirement in [ACCEPTANCE.md
 | US-01 | Account created + verification email | `POST /auth/register`, `GET /auth/verify-email/:token` | users, email_verification_tokens | `email.send` job (`verifyEmail` template). Single-use link valid for 24 h; `POST /auth/verify-email/resend` sends a new one (one per minute) |
 | US-01 | Unverified email blocks login | `POST /auth/login` | users.email_verified_at | Login guard (password accounts), 403 `EMAIL_NOT_VERIFIED` |
 | US-01 | Duplicate email rejected | `POST /auth/register` | users (`email` UK) | 409 `EMAIL_TAKEN` |
-| US-01 | Password ≥8, number, special char | `POST /auth/register` | — | Joi (`modules/auth/validators.js`) + Zod mirror |
+| US-01 | Forgot password (added 2026-10-10) | `POST /auth/password/forgot`, `POST /auth/password/reset`; app `/forgot-password`, `/reset-password/:token` | password_reset_tokens | `passwordReset` email. Same reply whether or not the account exists; one link per minute; single-use, valid 1 h. Resetting revokes every session and verifies the email; suspended accounts get no link |
+| US-01 | Password ≥8, number, special char | `POST /auth/register`, `POST /auth/password/reset` | — | Joi (`modules/auth/validators.js`) + Zod mirror |
 | US-01 | Email verification required before active | `GET /auth/verify-email/:token` | users.status, email_verified_at | Status stays `pending` until the link is used; `requireVerified` returns 403 `EMAIL_NOT_VERIFIED` |
 | US-01 | Google registration alternative | `GET /auth/google` | users | See US-00A. Active at once (Google verified the email) |
 | US-02 | Resume PDF/DOCX < 5 MB | `POST /students/me/resume` | files, student_profiles.resume_file_id | Multer 5 MB limit (413 `FILE_TOO_LARGE`) + `file-type` magic bytes (415 `UNSUPPORTED_FILE_TYPE`), private bucket encrypted at rest, 5-minute presigned download |

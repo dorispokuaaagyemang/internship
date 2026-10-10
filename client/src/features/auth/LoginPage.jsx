@@ -4,7 +4,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { api, apiError } from '../../lib/api';
 import { applyServerErrors } from '../../lib/forms';
-import { Alert, Button, Field } from '../../components/ui';
+import { Alert, Button, Field, PasswordInput } from '../../components/ui';
 import { useAuth } from './auth-context';
 import { loginSchema } from './schemas';
 import { GoogleButton } from './GoogleButton';
@@ -56,6 +56,7 @@ export function LoginPage() {
     <main className="page page--narrow">
       <h1>Sign in</h1>
       {params.get('emailVerified') && <Alert tone="success">Your email is verified. You can sign in now.</Alert>}
+      {params.get('passwordReset') && <Alert tone="success">Your password has been changed. Sign in with the new one.</Alert>}
       {params.get('accountDeleted') && <Alert tone="success">Your account and personal data have been deleted.</Alert>}
       <Alert>{error}</Alert>
       {unverifiedEmail && (
@@ -75,8 +76,11 @@ export function LoginPage() {
           {(a11y) => <input type="email" autoComplete="email" {...a11y} {...register('email')} />}
         </Field>
         <Field label="Password" error={formState.errors.password?.message}>
-          {(a11y) => <input type="password" autoComplete="current-password" {...a11y} {...register('password')} />}
+          {(a11y) => <PasswordInput autoComplete="current-password" {...a11y} {...register('password')} />}
         </Field>
+        <p className="field__hint">
+          <Link to="/forgot-password">Forgot your password?</Link>
+        </p>
         <Button type="submit" busy={formState.isSubmitting}>
           Sign in
         </Button>

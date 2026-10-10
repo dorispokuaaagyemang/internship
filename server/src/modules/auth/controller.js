@@ -75,6 +75,18 @@ export async function resendVerification(req, res) {
   res.status(202).json({ message: 'If that account needs verification, a new link is on its way' });
 }
 
+// US-01: forgot password. The reply is the same whether or not the account exists.
+export async function forgotPassword(req, res) {
+  await auth.requestPasswordReset(req.body, { ip: req.ip });
+  res.status(202).json({ message: 'If an account uses that email, a reset link is on its way' });
+}
+
+// Every session is revoked, so the user signs in again with the new password.
+export async function resetPassword(req, res) {
+  await auth.resetPassword(req.body.token, req.body, { ip: req.ip });
+  res.status(204).end();
+}
+
 // Both Google endpoints are browser navigations, so every outcome is a redirect back to the
 // app: errors land on /login?error=<code>, e.g. google_denied (US-00A).
 const redirectToLogin = (res, err) => res.redirect(`${config.appUrl}/login?error=${err.code.toLowerCase()}`);

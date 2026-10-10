@@ -12,6 +12,7 @@ import {
   User,
   RefreshToken,
   EmailVerificationToken,
+  PasswordResetToken,
   AccountInvite,
   StudentProfile,
   Skill,
@@ -100,6 +101,7 @@ export async function anonymiseUser(userId, { actor = null, reason = null, ip = 
     await Notification.destroy({ where: { userId: user.id }, transaction });
     await RefreshToken.destroy({ where: { userId: user.id }, transaction });
     await EmailVerificationToken.destroy({ where: { userId: user.id }, transaction });
+    await PasswordResetToken.destroy({ where: { userId: user.id }, transaction });
     await AccountInvite.destroy({ where: { userId: user.id }, transaction });
     // A supervisor who leaves no longer holds interns; the company can assign someone else.
     await SupervisorAssignment.update({ active: false, endedAt: now }, { where: { supervisorUserId: user.id, active: true }, transaction });

@@ -15,6 +15,7 @@ vi.mock('../../src/db/models/index.js', () => {
     User: { findByPk: vi.fn() },
     RefreshToken: write(),
     EmailVerificationToken: write(),
+    PasswordResetToken: write(),
     AccountInvite: write(),
     StudentProfile: write(),
     StoredFile: write(),

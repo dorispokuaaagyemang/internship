@@ -3,7 +3,7 @@ import express from 'express';
 import request from 'supertest';
 import { UniqueConstraintError } from 'sequelize';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { User, RefreshToken, EmailVerificationToken } from '../../src/db/models/index.js';
+import { User, RefreshToken, EmailVerificationToken, PasswordResetToken } from '../../src/db/models/index.js';
 import redis from '../../src/lib/redis.js';
 import { enqueueEmail } from '../../src/jobs/queues.js';
 import { record } from '../../src/modules/audit/service.js';
@@ -18,6 +18,7 @@ vi.mock('../../src/db/models/index.js', () => ({
   User: { create: vi.fn(), findOne: vi.fn(), findByPk: vi.fn() },
   RefreshToken: { create: vi.fn(), findOne: vi.fn(), update: vi.fn() },
   EmailVerificationToken: { create: vi.fn(), findOne: vi.fn(), update: vi.fn() },
+  PasswordResetToken: { create: vi.fn(), findOne: vi.fn(), update: vi.fn() },
 }));
 vi.mock('../../src/lib/redis.js', () => ({ default: { get: vi.fn(), set: vi.fn(), del: vi.fn() } }));
 vi.mock('../../src/jobs/queues.js', () => ({ enqueueEmail: vi.fn() }));
@@ -55,6 +56,8 @@ beforeEach(() => {
   RefreshToken.update.mockResolvedValue([1]);
   EmailVerificationToken.create.mockResolvedValue({});
   EmailVerificationToken.update.mockResolvedValue([1]);
+  PasswordResetToken.create.mockResolvedValue({});
+  PasswordResetToken.update.mockResolvedValue([1]);
   enqueueEmail.mockResolvedValue({});
 });
 
@@ -454,5 +457,96 @@ describe('authorize()', () => {
     const res = await request(guarded).get('/admin-only').set('Authorization', `Bearer ${token}`);
 
     expect(res.status).toBe(200);
+  });
+});
+
+describe('POST /api/v1/auth/password/forgot (US-01)', () => {
+  const forgot = (email = 'ada@example.com') => request(app).post('/api/v1/auth/password/forgot').send({ email });
+
+  it('emails a single-use link to the app, storing only its hash', async () => {
+    User.findOne.mockResolvedValue(makeUser());
+    PasswordResetToken.findOne.mockResolvedValue(null);
+
+    const res = await forgot('Ada@Example.com');
+
+    expect(res.status).toBe(202);
+    expect(User.findOne).toHaveBeenCalledWith({ where: { email: 'ada@example.com' } });
+    const [template, to, { url, expiresInMinutes }] = enqueueEmail.mock.calls[0];
+    expect([template, to, expiresInMinutes]).toEqual(['passwordReset', 'ada@example.com', 60]);
+    const token = url.match(/^http:\/\/localhost:5173\/reset-password\/(.+)$/)[1];
+    expect(PasswordResetToken.create.mock.calls[0][0]).toMatchObject({ userId: 7, tokenHash: hashToken(token) });
+    expect(record).toHaveBeenCalledWith(expect.objectContaining({ action: 'auth.password_reset_requested' }));
+  });
+
+  it('gives the same answer for an unknown email, a suspended account or a link sent under a minute ago', async () => {
+    User.findOne
+      .mockResolvedValueOnce(null)
+      .mockResolvedValueOnce(makeUser({ status: 'suspended' }))
+      .mockResolvedValueOnce(makeUser());
+    PasswordResetToken.findOne.mockResolvedValue({ id: 1 });
+
+    for (let i = 0; i < 3; i++) expect((await forgot()).status).toBe(202);
+    expect(PasswordResetToken.create).not.toHaveBeenCalled();
+    expect(enqueueEmail).not.toHaveBeenCalled();
+  });
+});
+
+describe('POST /api/v1/auth/password/reset (US-01)', () => {
+  const reset = (body = { token: 'the-token', password: 'n3w#password' }) => request(app).post('/api/v1/auth/password/reset').send(body);
+  const stored = (overrides = {}) => ({ id: 4, userId: 7, usedAt: null, expiresAt: new Date(Date.now() + 60_000), ...overrides });
+
+  it('sets the new password, uses up the link and signs out every session', async () => {
+    const user = makeUser();
+    PasswordResetToken.findOne.mockResolvedValue(stored());
+    User.findByPk.mockResolvedValue(user);
+
+    const res = await reset();
+
+    expect(res.status).toBe(204);
+    expect(PasswordResetToken.findOne).toHaveBeenCalledWith({ where: { tokenHash: hashToken('the-token') } });
+    expect(PasswordResetToken.update).toHaveBeenCalledWith({ usedAt: expect.any(Date) }, expect.objectContaining({ where: { id: 4, usedAt: null } }));
+    expect(await bcrypt.compare('n3w#password', user.passwordHash)).toBe(true);
+    expect(user.save).toHaveBeenCalled();
+    expect(RefreshToken.update).toHaveBeenCalledWith({ revokedAt: expect.any(Date) }, expect.objectContaining({ where: { userId: 7, revokedAt: null } }));
+    expect(record).toHaveBeenCalledWith(expect.objectContaining({ action: 'auth.password_reset' }), expect.anything());
+  });
+
+  it('verifies the email of a pending account, since the link proves the address', async () => {
+    const user = makeUser({ status: 'pending', emailVerifiedAt: null });
+    PasswordResetToken.findOne.mockResolvedValue(stored());
+    User.findByPk.mockResolvedValue(user);
+
+    expect((await reset()).status).toBe(204);
+    expect(user.emailVerifiedAt).toEqual(expect.any(Date));
+    expect(user.status).toBe('active');
+  });
+
+  it('applies the registration password rules', async () => {
+    const res = await reset({ token: 'the-token', password: 'short' });
+
+    expect(res.status).toBe(422);
+    expect(res.body.error.fields).toHaveProperty('password');
+    expect(PasswordResetToken.findOne).not.toHaveBeenCalled();
+  });
+
+  it('refuses an unknown, used or expired link', async () => {
+    PasswordResetToken.findOne
+      .mockResolvedValueOnce(null)
+      .mockResolvedValueOnce(stored({ usedAt: new Date() }))
+      .mockResolvedValueOnce(stored({ expiresAt: new Date(Date.now() - 1000) }));
+
+    expect((await reset()).body.error.code).toBe('RESET_LINK_INVALID');
+    expect((await reset()).body.error.code).toBe('RESET_LINK_INVALID');
+    const expired = await reset();
+    expect([expired.status, expired.body.error.code]).toEqual([410, 'RESET_LINK_EXPIRED']);
+    expect(PasswordResetToken.update).not.toHaveBeenCalled();
+  });
+
+  it('refuses a suspended account', async () => {
+    PasswordResetToken.findOne.mockResolvedValue(stored());
+    User.findByPk.mockResolvedValue(makeUser({ status: 'suspended' }));
+
+    expect((await reset()).body.error.code).toBe('ACCOUNT_SUSPENDED');
+    expect(PasswordResetToken.update).not.toHaveBeenCalled();
   });
 });

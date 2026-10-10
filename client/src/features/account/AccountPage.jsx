@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useQueryClient } from '@tanstack/react-query';
 import { api, apiError, setSession } from '../../lib/api';
-import { Alert, Button, Card, Field } from '../../components/ui';
+import { Alert, Button, Card, Field, PasswordInput } from '../../components/ui';
 import { useAuth } from '../auth/auth-context';
 
 // Data protection rights for every signed-in user: download everything held about you
@@ -91,15 +91,13 @@ function DeleteAccount() {
       </p>
       <form onSubmit={onDelete} className="stack">
         <Field label={byPassword ? 'Your password' : `Type your email address (${user.email}) to confirm`} error={error}>
-          {(a11y) => (
-            <input
-              type={byPassword ? 'password' : 'email'}
-              autoComplete={byPassword ? 'current-password' : 'off'}
-              value={value}
-              onChange={(e) => setValue(e.target.value)}
-              {...a11y}
-            />
-          )}
+          {(a11y) =>
+            byPassword ? (
+              <PasswordInput autoComplete="current-password" value={value} onChange={(e) => setValue(e.target.value)} {...a11y} />
+            ) : (
+              <input type="email" autoComplete="off" value={value} onChange={(e) => setValue(e.target.value)} {...a11y} />
+            )
+          }
         </Field>
         <div>
           <Button type="submit" variant="danger" busy={busy} disabled={!value}>

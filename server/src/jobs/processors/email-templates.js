@@ -22,6 +22,22 @@ export const templates = {
 <p>The link expires in ${escapeHtml(expiresInHours)} hours. If you did not create an account, ignore this email.</p>`,
   }),
 
+  // US-01: forgot password.
+  passwordReset: ({ url, expiresInMinutes }) => ({
+    subject: 'Reset your password',
+    text: [
+      'Someone asked to reset the password of your Internship Platform account.',
+      '',
+      'Choose a new password by opening this link:',
+      url,
+      '',
+      `The link expires in ${expiresInMinutes} minutes and works once. If you did not ask for this, ignore this email: your password stays the same.`,
+    ].join('\n'),
+    html: `<p>Someone asked to reset the password of your Internship Platform account.</p>
+<p><a href="${escapeHtml(url)}">Choose a new password</a></p>
+<p>The link expires in ${escapeHtml(expiresInMinutes)} minutes and works once. If you did not ask for this, ignore this email: your password stays the same.</p>`,
+  }),
+
   // US-04: an admin verified the company, so it can now post internships.
   companyApproved: ({ companyName, url }) => ({
     subject: `${companyName} is verified`,

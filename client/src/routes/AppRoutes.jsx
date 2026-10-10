@@ -14,6 +14,8 @@ const RegisterPage = named(() => import('../features/auth/RegisterPage'), 'Regis
 const VerifyPage = named(() => import('../features/auth/VerifyPage'), 'VerifyPage');
 const AuthCompletePage = named(() => import('../features/auth/AuthCompletePage'), 'AuthCompletePage');
 const AcceptInvitePage = named(() => import('../features/auth/AcceptInvitePage'), 'AcceptInvitePage');
+const ForgotPasswordPage = named(() => import('../features/auth/PasswordResetPages'), 'ForgotPasswordPage');
+const ResetPasswordPage = named(() => import('../features/auth/PasswordResetPages'), 'ResetPasswordPage');
 
 const NotificationsPage = named(() => import('../features/notifications/NotificationsPage'), 'NotificationsPage');
 
@@ -57,10 +59,13 @@ export function AppRoutes() {
         <Route element={<GuestOnly />}>
           <Route path="/login" element={<LoginPage />} />
           <Route path="/register" element={<RegisterPage />} />
+          <Route path="/forgot-password" element={<ForgotPasswordPage />} />
         </Route>
         <Route path="/auth/complete" element={<AuthCompletePage />} />
         {/* US-09: the link a company emails to a new supervisor. */}
         <Route path="/accept-invite/:token" element={<AcceptInvitePage />} />
+        {/* US-01: the emailed "forgot password" link. */}
+        <Route path="/reset-password/:token" element={<ResetPasswordPage />} />
         <Route path="/privacy" element={<PrivacyPage />} />
 
         {/* US-03: anyone can browse; applying needs a verified student (checked on the page and by the API). */}

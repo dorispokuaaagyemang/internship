@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { useForm, useWatch } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { applyServerErrors } from '../../lib/forms';
-import { Alert, Button, Field } from '../../components/ui';
+import { Alert, Button, Field, PasswordInput } from '../../components/ui';
 import { useAuth } from './auth-context';
 import { registerSchema } from './schemas';
 import { GoogleButton } from './GoogleButton';
@@ -59,7 +59,7 @@ export function RegisterPage() {
           error={formState.errors.password?.message}
           hint="At least 8 characters, with a number and a special character."
         >
-          {(a11y) => <input type="password" autoComplete="new-password" {...a11y} {...register('password')} />}
+          {(a11y) => <PasswordInput autoComplete="new-password" {...a11y} {...register('password')} />}
         </Field>
         <Field
           label={role === 'company_rep' ? 'Company contact phone' : 'Phone number'}

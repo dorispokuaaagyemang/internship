@@ -144,6 +144,7 @@ erDiagram
     users ||--o{ notifications : receives
     users ||--o{ refresh_tokens : holds
     users ||--o{ email_verification_tokens : holds
+    users ||--o{ password_reset_tokens : holds
     users ||--o{ audit_logs : performs
 
     users {
@@ -272,6 +273,13 @@ erDiagram
         datetime revoked_at
     }
     email_verification_tokens {
+        int id PK
+        int user_id FK
+        string token_hash UK
+        datetime expires_at
+        datetime used_at
+    }
+    password_reset_tokens {
         int id PK
         int user_id FK
         string token_hash UK
@@ -553,7 +561,7 @@ The API also refuses applications after a posting's deadline, so no application 
 
 | Module | Endpoints |
 |---|---|
-| auth | `POST /auth/register`, `POST /auth/login`, `POST /auth/refresh`, `POST /auth/logout`, `GET /auth/me`, `GET /auth/google`, `GET /auth/google/callback`, `GET /auth/verify-email/:token`, `POST /auth/verify-email/resend`, `GET /auth/invite/:token`, `POST /auth/invite/accept` |
+| auth | `POST /auth/register`, `POST /auth/login`, `POST /auth/refresh`, `POST /auth/logout`, `GET /auth/me`, `GET /auth/google`, `GET /auth/google/callback`, `GET /auth/verify-email/:token`, `POST /auth/verify-email/resend`, `POST /auth/password/forgot`, `POST /auth/password/reset`, `GET /auth/invite/:token`, `POST /auth/invite/accept` |
 | students | `GET /students/me`, `PUT /students/me`, `POST /students/me/resume`, `GET /students/me/resume` (presigned link), `DELETE /students/me/resume` |
 | companies | `POST /companies`, `GET /companies/me`, `GET /companies/me/staff`, `POST /companies/me/staff`, `POST /companies/me/staff/:userId/invite` |
 | postings | `GET /postings?q&location&domain&page&limit` (public), `GET /postings/:id`, `GET /companies/me/postings`, `POST /postings`, `PUT /postings/:id`, `POST /postings/:id/publish`, `POST /postings/:id/close` |

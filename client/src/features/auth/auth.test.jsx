@@ -8,6 +8,7 @@ import { GuestOnly, RequireActive, RequireAuth, RequireRole } from './guards';
 import { LoginPage } from './LoginPage';
 import { RegisterPage } from './RegisterPage';
 import { VerifyPage } from './VerifyPage';
+import { ForgotPasswordPage, ResetPasswordPage } from './PasswordResetPages';
 
 vi.mock('../../lib/api', async (importOriginal) => {
   const actual = await importOriginal();
@@ -49,6 +50,20 @@ describe('LoginPage', () => {
   it('explains the outcome of an email link or Google sign-in', () => {
     renderApp(<LoginPage />, { route: '/login?error=google_denied', path: '/login', auth: makeAuth({ status: 'signedOut', user: null }) });
     expect(screen.getByText('Google sign-in was cancelled.')).toBeInTheDocument();
+  });
+
+  it('shows and hides the typed password', async () => {
+    renderApp(<LoginPage />, { route: '/login', path: '/login', auth: makeAuth({ status: 'signedOut', user: null }) });
+    const password = screen.getByLabelText('Password');
+    await userEvent.type(password, 'secret#123');
+    expect(password).toHaveAttribute('type', 'password');
+
+    await userEvent.click(screen.getByRole('button', { name: 'Show password' }));
+    expect(password).toHaveAttribute('type', 'text');
+    expect(password).toHaveValue('secret#123');
+
+    await userEvent.click(screen.getByRole('button', { name: 'Hide password' }));
+    expect(password).toHaveAttribute('type', 'password');
   });
 });
 
@@ -165,5 +180,48 @@ describe('route guards', () => {
     );
     renderApp(guest, { route: '/login?next=%2F%2Fevil.example' });
     expect(screen.getByTestId('location')).toHaveTextContent('/student');
+  });
+});
+
+describe('forgot password (US-01)', () => {
+  it('asks for a link and confirms without revealing whether the account exists', async () => {
+    api.post.mockResolvedValue({ data: {} });
+    renderApp(<ForgotPasswordPage />, { route: '/forgot-password', path: '/forgot-password', auth: makeAuth({ status: 'signedOut', user: null }) });
+
+    await userEvent.type(screen.getByLabelText('Email'), 'ada@example.com');
+    await userEvent.click(screen.getByRole('button', { name: 'Send reset link' }));
+
+    expect(api.post).toHaveBeenCalledWith('/auth/password/forgot', { email: 'ada@example.com' });
+    expect(await screen.findByText(/If an account uses ada@example.com/)).toBeInTheDocument();
+  });
+
+  it('sets the new password from the emailed link, then sends the user to sign in', async () => {
+    api.post.mockResolvedValue({ data: {} });
+    renderApp(<ResetPasswordPage />, { route: '/reset-password/abc', path: '/reset-password/:token', auth: makeAuth({ status: 'signedOut', user: null }) });
+
+    await userEvent.type(screen.getByLabelText('New password'), 'n3w#password');
+    await userEvent.type(screen.getByLabelText('Confirm new password'), 'n3w#passw0rd');
+    await userEvent.click(screen.getByRole('button', { name: 'Set new password' }));
+    expect(await screen.findByText('The passwords do not match')).toBeInTheDocument();
+    expect(api.post).not.toHaveBeenCalled();
+
+    await userEvent.clear(screen.getByLabelText('Confirm new password'));
+    await userEvent.type(screen.getByLabelText('Confirm new password'), 'n3w#password');
+    await userEvent.click(screen.getByRole('button', { name: 'Set new password' }));
+
+    expect(api.post).toHaveBeenCalledWith('/auth/password/reset', { token: 'abc', password: 'n3w#password' });
+    expect(await screen.findByTestId('location')).toHaveTextContent('/login?passwordReset=1');
+  });
+
+  it('offers a new link when the emailed one has expired', async () => {
+    api.post.mockRejectedValue(apiFailure(410, 'RESET_LINK_EXPIRED', 'This reset link has expired. Request a new one.'));
+    renderApp(<ResetPasswordPage />, { route: '/reset-password/abc', path: '/reset-password/:token', auth: makeAuth({ status: 'signedOut', user: null }) });
+
+    await userEvent.type(screen.getByLabelText('New password'), 'n3w#password');
+    await userEvent.type(screen.getByLabelText('Confirm new password'), 'n3w#password');
+    await userEvent.click(screen.getByRole('button', { name: 'Set new password' }));
+
+    expect(await screen.findByText('This reset link has expired. Request a new one.')).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: 'Request a new link' })).toHaveAttribute('href', '/forgot-password');
   });
 });
