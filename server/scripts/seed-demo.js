@@ -77,6 +77,26 @@ const COMPANIES = [
     rep: ['nii.lartey', 'Nii Lartey', '+233244100203'],
     supervisors: [['adwoa.sarpong', 'Adwoa Sarpong']],
   },
+  {
+    key: 'sika',
+    name: 'Sika Microfinance',
+    regNumber: 'DEMO-CS-100006',
+    contactPhone: '+233322190106',
+    website: 'https://sika-microfinance.example',
+    status: 'verified',
+    rep: ['serwaa.badu', 'Serwaa Badu', '+233244100206'],
+    supervisors: [['kwesi.mensah', 'Kwesi Mensah']],
+  },
+  {
+    key: 'osu',
+    name: 'Osu Media House',
+    regNumber: 'DEMO-CS-100007',
+    contactPhone: '+233302775507',
+    website: 'https://osu-media.example',
+    status: 'verified',
+    rep: ['dede.tetteh', 'Dede Tetteh', '+233244100207'],
+    supervisors: [['edem.kpodo', 'Edem Kpodo']],
+  },
   // Waiting for an admin to approve it (US-04).
   {
     key: 'kente',
@@ -135,6 +155,21 @@ const POSTINGS = [
   ['supply', 'harbour', 'Supply Chain Intern', 'Logistics', 'Tema', 12, 1000, 'active', 49, ['Project Management', 'Excel']],
   ['finance', 'harbour', 'Finance and Accounts Intern', 'Finance', 'Tema', 12, 1000, 'active', 56, ['Accounting', 'Excel']],
   ['itsupport', 'harbour', 'IT Support Intern', 'Information Technology', 'Tema', 10, 900, 'draft', 70, ['Networking']],
+  ['qa', 'volta', 'QA and Test Automation Intern', 'Software Engineering', 'Accra (hybrid)', 12, 1300, 'active', 38, ['JavaScript', 'Communication']],
+  ['devops', 'volta', 'Cloud and DevOps Intern', 'Information Technology', 'Accra', 12, 1500, 'active', 45, ['Networking', 'Python']],
+  ['uiux', 'volta', 'UI/UX Design Intern', 'Design', 'Accra', 10, 1100, 'active', 33, ['Graphic Design', 'Communication']],
+  ['gis', 'agritech', 'GIS and Mapping Intern', 'Data & Analytics', 'Kumasi', 12, 1100, 'active', 40, ['Data Analysis', 'Python']],
+  ['agrimarketing', 'agritech', 'Agri-Marketing Intern', 'Marketing', 'Kumasi', 10, 900, 'active', 31, ['Marketing', 'Communication']],
+  ['warehouse', 'harbour', 'Warehouse Operations Intern', 'Logistics', 'Tema', 8, 900, 'active', 29, ['Excel', 'Project Management']],
+  ['procurement', 'harbour', 'Procurement Intern', 'Logistics', 'Tema', 12, 1000, 'active', 52, ['Excel', 'Communication']],
+  ['hr', 'harbour', 'Human Resources Intern', 'Human Resources', 'Tema', 12, 900, 'active', 36, ['Communication', 'Excel']],
+  ['credit', 'sika', 'Credit Analyst Intern', 'Finance', 'Takoradi', 12, 1200, 'active', 41, ['Accounting', 'Data Analysis', 'Excel']],
+  ['audit', 'sika', 'Internal Audit Intern', 'Finance', 'Takoradi', 12, 1100, 'active', 47, ['Accounting', 'Excel']],
+  ['mobilemoney', 'sika', 'Mobile Money Product Intern', 'Software Engineering', 'Takoradi (hybrid)', 12, 1300, 'active', 54, ['Mobile Development', 'SQL']],
+  ['customer', 'sika', 'Customer Service Intern', 'Customer Service', 'Cape Coast', 8, 700, 'active', 30, ['Communication']],
+  ['content', 'osu', 'Digital Content Creator Intern', 'Marketing', 'Accra', 10, 1000, 'active', 34, ['Marketing', 'Communication']],
+  ['graphics', 'osu', 'Graphic Design Intern', 'Design', 'Accra', 10, 1000, 'active', 43, ['Graphic Design']],
+  ['journalism', 'osu', 'Broadcast Journalism Intern', 'Media', 'Accra', 12, 900, 'active', 58, ['Communication']],
 ];
 
 const DESCRIPTIONS = {
@@ -147,6 +182,11 @@ const DESCRIPTIONS = {
   Logistics: 'Support the operations team at Tema Port: shipment tracking, warehouse reporting and process-improvement projects.',
   Finance: 'Assist the finance team with bookkeeping, reconciliations, payroll preparation and month-end reporting.',
   'Information Technology': 'Keep our offices running: helpdesk tickets, network maintenance, device setup and documentation.',
+  Design: 'Design screens, social graphics and brand assets with our creative team, from first sketch to handover, and test your work with real users.',
+  Marketing: 'Plan and run campaigns across radio, social media and community events, track their results and help write the monthly marketing report.',
+  'Human Resources': 'Support recruitment, onboarding and staff records, and help organise training sessions and staff welfare activities.',
+  'Customer Service': 'Help customers in the branch and on the phone with accounts, mobile money and loan enquiries, and log their feedback for the product team.',
+  Media: 'Research stories, write scripts and assist on radio and TV productions in our Osu newsroom, under the guidance of senior editors.',
 };
 
 // [student, posting, final status, days since applying]

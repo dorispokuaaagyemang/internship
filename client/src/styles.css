@@ -65,6 +65,7 @@ h1 {
   font-size: 1.75rem;
   line-height: 1.25;
   margin: 0 0 0.75rem;
+  overflow-wrap: anywhere;
 }
 
 h2 {
@@ -756,9 +757,15 @@ h2 + .tags__list,
   font-size: 0.85rem;
 }
 
+/* min-width: 0 lets a grid cell shrink, so a long value such as an email wraps inside it. */
+.facts > div {
+  min-width: 0;
+}
+
 .facts dd {
   margin: 0;
   font-weight: 600;
+  overflow-wrap: anywhere;
 }
 
 /* Application timeline */
@@ -804,6 +811,7 @@ h2 + .tags__list,
   text-align: left;
   padding: 0.65rem 0.9rem;
   border-top: 1px solid var(--border);
+  overflow-wrap: anywhere;
 }
 
 .table thead th {
