@@ -38,7 +38,7 @@ retention) wait until the next request wakes it. Use Starter for real users.
 - The code is on GitHub (or GitLab), and both Render and Vercel can read the repository.
 - A **production** Aiven MySQL service (not the development one), with its `ca.pem`.
 - **Production** R2 buckets `resumes` and `certificates`, and an R2 API token for them.
-- An SMTP account (e.g. Brevo's free plan) with a verified sender address.
+- An SMTP account (Resend's free plan, see docs/EMAIL.md) with a verified sending domain. Render's free plan blocks ports 25/465/587, so use Resend's port 2587.
 - One random secret, for `ORIGIN_SECRET`:
   `node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"`
 

@@ -18,27 +18,28 @@ production refuses to start without it, because accounts are activated by email.
 Test them with `npm run mail:test -w server -- you@example.com`. It checks the login and sends
 one email.
 
-## Option A: Brevo (recommended, free 300 emails a day)
+## Option A: Resend (recommended, free 3,000 emails a month, 100 a day)
 
-1. Sign up at brevo.com.
-2. **Senders, domains, IPs → Senders → Add a sender**: the address emails come from. Brevo emails
-   it a confirmation link.
-3. **SMTP & API → SMTP**: note the **SMTP server**, **port** and **login**. Click **Generate a new
-   SMTP key** and copy it (shown once).
+1. Sign up at resend.com.
+2. **Domains → Add Domain**: enter your domain (e.g. `devpokuaa.com`, or a subdomain such as
+   `mail.devpokuaa.com`). Add the DNS records Resend shows (DKIM, SPF/MX, and optionally DMARC) at
+   your DNS provider, then click **Verify**. Resend only sends from a verified domain; its shared
+   `onboarding@resend.dev` sender can only mail your own Resend account address.
+3. **API Keys → Create API Key** with "Sending access" (shown once). It is the SMTP password.
 4. In `.env` (locally) or the Render settings (production):
    ```
-   SMTP_HOST=smtp-relay.brevo.com
-   SMTP_PORT=587
+   SMTP_HOST=smtp.resend.com
+   SMTP_PORT=2587
    SMTP_SECURE=false
-   SMTP_USER=<the SMTP login, e.g. 8a1b2c001@smtp-brevo.com>
-   SMTP_PASSWORD=<the SMTP key>
-   MAIL_FROM=Internship Platform <the sender address from step 2>
+   SMTP_USER=resend
+   SMTP_PASSWORD=<the API key, re_...>
+   MAIL_FROM=Internship Platform <noreply@devpokuaa.com>
    ```
 
-With a Gmail or Yahoo address as the sender, mail from Brevo often lands in spam or is refused,
-because those providers only trust their own servers for their addresses. For real users, send
-from your own domain and authenticate it: **Senders, domains, IPs → Domains → Add a domain**, then
-add the DNS records Brevo shows (DKIM, and the SPF and DMARC entries) at your domain registrar.
+`SMTP_USER` is literally the word `resend`. Port `2587` (or `2465` with `SMTP_SECURE=true`) is used
+instead of 587/465 because Render's free instances block outgoing traffic on the standard SMTP
+ports 25, 465 and 587; Resend accepts the same connection on 2587/2465. On a paid Render plan or a
+VPS, 587 also works. `MAIL_FROM` must use the domain verified in step 2.
 
 ## Option B: Gmail (quickest to try, about 500 emails a day)
 
@@ -57,7 +58,7 @@ Good for development and a small pilot; it sends as your Gmail address.
    MAIL_FROM=Internship Platform <your Gmail address>
    ```
 
-Gmail limits daily sending and may pause an account that sends a lot, so move to Brevo (or
+Gmail limits daily sending and may pause an account that sends a lot, so move to Resend (or
 another provider) with your own domain before launch.
 
 ## Local development without real email
